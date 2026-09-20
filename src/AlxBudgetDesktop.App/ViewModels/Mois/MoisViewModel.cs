@@ -5,6 +5,7 @@ using AlxBudgetDesktop.App.ViewModels.Dialogs;
 using AlxBudgetDesktop.App.ViewModels.Shell;
 using AlxBudgetDesktop.Data.Csv;
 using AlxBudgetDesktop.Data.Repositories;
+using AlxBudgetDesktop.Data.Services;
 using AlxBudgetDesktop.Domain.Csv;
 using AlxBudgetDesktop.Domain.Models;
 using AlxBudgetDesktop.Domain.Rapprochement;
@@ -213,8 +214,8 @@ public sealed class MoisViewModel : TabViewModelBase
         TotalRecettes = Achats.Where(a => a.EstRecette).Sum(a => a.MontantAchat);
         SoldeMois = TotalRecettes - TotalDepenses;
 
-        var calages = _soldesRepository.ChargerCalages(Annee);
-        var soldesAnnee = SoldesService.CalculerSoldesAnnee(Annee, achatsAnnee, calages, _groupes);
+        var soldesAnneeService = new SoldesAnneeService(_achatsRepository, _postesRepository, _soldesRepository);
+        var soldesAnnee = soldesAnneeService.CalculerSoldesAnnee(Annee);
         var soldesMois = soldesAnnee.Mois[Mois];
 
         OuvertureCourant = soldesMois.Ouverture.Courant;
