@@ -14,4 +14,7 @@ public interface IDialogService
 
     /// <summary>true si la suppression a été confirmée.</summary>
     bool ShowConfirmDelete(ConfirmDeleteModalViewModel viewModel);
+
+    /// <summary>true si un calage a été enregistré ou supprimé (dans les deux cas, l'appelant doit rafraîchir).</summary>
+    bool ShowCalageModal(CalageModalViewModel viewModel);
 }

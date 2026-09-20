@@ -9,10 +9,9 @@ using AlxBudgetDesktop.Domain.Services;
 namespace AlxBudgetDesktop.App.ViewModels.Mois;
 
 /// <summary>
-/// Onglet d'un mois : bandeau de soldes (vue normale uniquement à ce stade — pas
-/// encore de calage manuel), liste des opérations et saisie manuelle (dépense/recette).
-/// Le contrôle de rapprochement bancaire et la validation de mois sont hors scope ici,
-/// développés dans une session dédiée ultérieure.
+/// Onglet d'un mois : bandeau de soldes (avec calage manuel), liste des opérations et
+/// saisie manuelle (dépense/recette). Le contrôle de rapprochement bancaire et la
+/// validation de mois sont hors scope ici, développés dans une session dédiée ultérieure.
 /// </summary>
 public sealed class MoisViewModel : TabViewModelBase
 {
@@ -74,10 +73,40 @@ public sealed class MoisViewModel : TabViewModelBase
     public decimal MouvementsEpargne { get => _mouvementsEpargne; private set => SetProperty(ref _mouvementsEpargne, value); }
     public decimal DisponibleEpargne { get => _disponibleEpargne; private set => SetProperty(ref _disponibleEpargne, value); }
 
+    private bool _estCale;
+    public bool EstCale { get => _estCale; private set => SetProperty(ref _estCale, value); }
+
+    private decimal _reportCourant, _reportTr, _reportEpargne;
+    public decimal ReportCourant { get => _reportCourant; private set => SetProperty(ref _reportCourant, value); }
+    public decimal ReportTr { get => _reportTr; private set => SetProperty(ref _reportTr, value); }
+    public decimal ReportEpargne { get => _reportEpargne; private set => SetProperty(ref _reportEpargne, value); }
+
+    private decimal _correctionCourant, _correctionTr, _correctionEpargne;
+    public decimal CorrectionCourant
+    {
+        get => _correctionCourant;
+        private set { if (SetProperty(ref _correctionCourant, value)) OnPropertyChanged(nameof(CorrectionCourantPositive)); }
+    }
+    public decimal CorrectionTr
+    {
+        get => _correctionTr;
+        private set { if (SetProperty(ref _correctionTr, value)) OnPropertyChanged(nameof(CorrectionTrPositive)); }
+    }
+    public decimal CorrectionEpargne
+    {
+        get => _correctionEpargne;
+        private set { if (SetProperty(ref _correctionEpargne, value)) OnPropertyChanged(nameof(CorrectionEpargnePositive)); }
+    }
+
+    public bool CorrectionCourantPositive => CorrectionCourant >= 0;
+    public bool CorrectionTrPositive => CorrectionTr >= 0;
+    public bool CorrectionEpargnePositive => CorrectionEpargne >= 0;
+
     public RelayCommand AjouterDepenseCommand { get; }
     public RelayCommand AjouterRecetteCommand { get; }
     public RelayCommand<AchatLigneViewModel> ModifierCommand { get; }
     public RelayCommand<AchatLigneViewModel> SupprimerCommand { get; }
+    public RelayCommand OuvrirCalageCommand { get; }
 
     public MoisViewModel(
         int mois,
@@ -100,6 +129,7 @@ public sealed class MoisViewModel : TabViewModelBase
         AjouterRecetteCommand = new RelayCommand(() => OuvrirModaleAjout(ModeAchat.Recette));
         ModifierCommand = new RelayCommand<AchatLigneViewModel>(OuvrirModaleModification);
         SupprimerCommand = new RelayCommand<AchatLigneViewModel>(Supprimer);
+        OuvrirCalageCommand = new RelayCommand(OuvrirCalage);
 
         Charger();
     }
@@ -141,6 +171,14 @@ public sealed class MoisViewModel : TabViewModelBase
         OuvertureEpargne = soldesMois.Ouverture.Epargne;
         MouvementsEpargne = soldesMois.Mouvements.Epargne;
         DisponibleEpargne = soldesMois.Disponible.Epargne;
+
+        EstCale = soldesMois.Cale;
+        ReportCourant = soldesMois.Report.Courant;
+        ReportTr = soldesMois.Report.TicketRestaurant;
+        ReportEpargne = soldesMois.Report.Epargne;
+        CorrectionCourant = OuvertureCourant - ReportCourant;
+        CorrectionTr = OuvertureTr - ReportTr;
+        CorrectionEpargne = OuvertureEpargne - ReportEpargne;
     }
 
     private static bool EstRecette(Achat achat, IReadOnlySet<string> recettes) => achat.Postes.Keys.Any(recettes.Contains);
@@ -172,6 +210,20 @@ public sealed class MoisViewModel : TabViewModelBase
         var mode = ligne.EstRecette ? ModeAchat.Recette : ModeAchat.Depense;
         var vm = new AchatModalViewModel(mode, _groupes, _achatsRepository, DateParDefaut(), ligne.Achat);
         if (_dialogService.ShowAchatModal(vm))
+        {
+            Charger();
+        }
+    }
+
+    private void OuvrirCalage()
+    {
+        var report = new SoldesComptes { Courant = ReportCourant, TicketRestaurant = ReportTr, Epargne = ReportEpargne };
+        var calageExistant = EstCale
+            ? new SoldesComptes { Courant = OuvertureCourant, TicketRestaurant = OuvertureTr, Epargne = OuvertureEpargne }
+            : null;
+
+        var vm = new CalageModalViewModel(Annee, SoldesService.CleMois(Annee, Mois), report, calageExistant, _soldesRepository);
+        if (_dialogService.ShowCalageModal(vm))
         {
             Charger();
         }

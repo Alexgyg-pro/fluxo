@@ -12,6 +12,9 @@ public sealed class DialogService : IDialogService
     public bool ShowConfirmDelete(ConfirmDeleteModalViewModel viewModel)
         => ShowModal(new ConfirmDeleteModalWindow { DataContext = viewModel }, viewModel);
 
+    public bool ShowCalageModal(CalageModalViewModel viewModel)
+        => ShowModal(new CalageModalWindow { DataContext = viewModel }, viewModel);
+
     private static bool ShowModal(Window fenetre, ModalViewModelBase viewModel)
     {
         var resultat = false;
