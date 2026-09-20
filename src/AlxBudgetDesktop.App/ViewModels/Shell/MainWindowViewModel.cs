@@ -55,6 +55,9 @@ public sealed class MainWindowViewModel : ObservableObject
         OngletsAutres.Add(new ImportViewModel());
         OngletsAutres.Add(new AdminViewModel());
 
-        _ongletSelectionne = OngletsMois[0];
+        // Sélectionne le mois courant au lancement (si l'année affichée est bien
+        // l'année civile en cours) ; sinon janvier par défaut.
+        var aujourdhui = DateTime.Now;
+        _ongletSelectionne = aujourdhui.Year == Annee ? OngletsMois[aujourdhui.Month - 1] : OngletsMois[0];
     }
 }
