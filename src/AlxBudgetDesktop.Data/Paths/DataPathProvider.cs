@@ -7,8 +7,11 @@ namespace AlxBudgetDesktop.Data.Paths;
 /// 3. Dossier "sample-data" à la racine du dépôt, si on le détecte (présence d'un
 ///    .sln en remontant depuis l'exécutable) — le cas normal en développement
 ///    (dotnet run), pour que les données survivent aux recompilations.
-/// 4. Dossier "sample-data" à côté de l'exécutable (cas d'un exécutable publié,
-///    hors dépôt, où aucun .sln n'est trouvable).
+/// 4. %LOCALAPPDATA%\alxBudgetDesktop\sample-data (cas d'un exécutable publié, hors
+///    dépôt, où aucun .sln n'est trouvable — ex. installé dans Program Files). Ne
+///    JAMAIS retomber sur "à côté de l'exécutable" dans ce cas : Program Files est
+///    protégé en écriture pour un utilisateur standard, l'appli planterait au
+///    premier lancement si on essayait d'y créer un dossier.
 ///
 /// Aucune valeur par défaut ne doit jamais référencer le dossier data\ réel
 /// d'alxBudget — les données réelles ne sont pointées qu'après validation
@@ -31,7 +34,7 @@ public sealed class DataPathProvider
                 ? cheminConfigure
                 : racineDepot is not null
                     ? Path.Combine(racineDepot, "sample-data")
-                    : Path.Combine(AppContext.BaseDirectory, "sample-data");
+                    : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "alxBudgetDesktop", "sample-data");
 
         DossierDonnees = Path.GetFullPath(DossierDonnees);
         Directory.CreateDirectory(DossierDonnees);
