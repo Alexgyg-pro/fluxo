@@ -2,7 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Barre d'onglets custom (pas de TabControl natif) : une ListBox horizontale
-         stylée en boutons, cohérente avec le shell "onglets maison" côté React. -->
+         stylée en boutons, cohérente avec le shell "onglets maison" côté React.
+         BorderThickness=0 est explicite : sans ça, ListBox garde le rectangle de
+         bordure par défaut du thème Windows autour de tout l'ensemble. -->
     <Style x:Key="StyleBarreOnglets" TargetType="ListBox">
         <Setter Property="ItemsPanel">
             <Setter.Value>
@@ -12,11 +14,14 @@
             </Setter.Value>
         </Setter>
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
+    <!-- Style générique (Budget/Import/Admin) : inchangé, pas de traitement "onglet". -->
     <Style x:Key="StyleOngletItem" TargetType="ListBoxItem">
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="Margin" Value="0,0,2,0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
@@ -26,6 +31,40 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Fond" Property="Background" Value="{StaticResource BrosseASaisirFond}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fond" Property="Background" Value="#F5F5F5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Style des onglets mois : chaque onglet porte sa propre ligne basse (leur
+         alignement côte à côte donne l'impression d'une seule ligne continue sous
+         tout l'ensemble). L'onglet sélectionné n'a PAS de ligne basse mais un
+         contour gauche/haut/droit, pour ressembler à un vrai onglet qui se détache
+         de la ligne — pas de superposition de bordures entre éléments à gérer,
+         chaque ListBoxItem est indépendant. -->
+    <Style x:Key="StyleOngletMoisItem" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Margin" Value="0,0,2,0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="Fond"
+                            Padding="{TemplateBinding Padding}"
+                            Background="Transparent"
+                            BorderBrush="{StaticResource BrosseBordure}"
+                            BorderThickness="0,0,0,1">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Fond" Property="Background" Value="{StaticResource BrosseASaisirFond}" />
+                            <Setter TargetName="Fond" Property="BorderThickness" Value="1,1,1,0" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Fond" Property="Background" Value="#F5F5F5" />

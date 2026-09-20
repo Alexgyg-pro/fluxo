@@ -27,13 +27,14 @@
 
         <!-- Barre d'onglets custom : pas de TabControl natif, pour rester fidèle au
              shell "onglets maison" côté React (App.tsx). Deux groupes distincts
-             partageant la même sélection : les mois à gauche, Budget/Import/Admin
-             à droite (DockPanel pousse chaque groupe vers son bord). -->
-        <Border Grid.Row="1" Margin="24,0,24,0" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BrosseBordure}">
-        <DockPanel LastChildFill="False">
+             partageant la même sélection : les mois à gauche (rendu façon "vrais
+             onglets", cf. StyleOngletMoisItem), Budget/Import/Admin à droite
+             (inchangés, simple ligne basse commune) — DockPanel pousse chaque
+             groupe vers son bord. -->
+        <DockPanel Grid.Row="1" Margin="24,0,24,0" LastChildFill="False">
             <ListBox DockPanel.Dock="Left"
                      Style="{StaticResource StyleBarreOnglets}"
-                     ItemContainerStyle="{StaticResource StyleOngletItem}"
+                     ItemContainerStyle="{StaticResource StyleOngletMoisItem}"
                      ItemsSource="{Binding OngletsMois}"
                      SelectedItem="{Binding OngletSelectionne, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
@@ -47,19 +48,19 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <ListBox DockPanel.Dock="Right"
-                     Style="{StaticResource StyleBarreOnglets}"
-                     ItemContainerStyle="{StaticResource StyleOngletItem}"
-                     ItemsSource="{Binding OngletsAutres}"
-                     SelectedItem="{Binding OngletSelectionne, Mode=TwoWay}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Titre}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <Border DockPanel.Dock="Right" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BrosseBordure}">
+                <ListBox Style="{StaticResource StyleBarreOnglets}"
+                         ItemContainerStyle="{StaticResource StyleOngletItem}"
+                         ItemsSource="{Binding OngletsAutres}"
+                         SelectedItem="{Binding OngletSelectionne, Mode=TwoWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Titre}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
         </DockPanel>
-        </Border>
 
         <ContentControl Grid.Row="2" Content="{Binding OngletSelectionne}" Margin="24,16,24,24" />
     </Grid>
