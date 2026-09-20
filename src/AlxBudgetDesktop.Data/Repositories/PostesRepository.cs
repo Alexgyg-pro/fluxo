@@ -9,9 +9,11 @@ public sealed class PostesRepository(DataPathProvider chemins, JsonFileStore sto
 {
     private string Chemin => chemins.CheminFichier("postes.json");
 
-    /// <summary>Seed initial, identique à POSTES_DEFAUT côté alxBudget (server/src/store/defaults.ts).</summary>
+    /// <summary>Seed initial, identique à POSTES_DEFAUT côté alxBudget (server/src/store/defaults.ts),
+    /// à l'ordre des groupes près : Revenus en tête (demande PO), au lieu de troisième.</summary>
     public static List<GroupePostes> PostesDefaut() =>
     [
+        new() { Nom = PostesSpeciaux.GroupeRevenus, Postes = ["Salaire", PostesSpeciaux.TicketsRestaurant, PostesSpeciaux.EpargneRetrait, "Divers"] },
         new() { Nom = "Dépenses incontournables", Postes = ["Loyer + charges", "EDF", "Box", "Téléphone portable"] },
         new()
         {
@@ -22,7 +24,6 @@ public sealed class PostesRepository(DataPathProvider chemins, JsonFileStore sto
                 "Mobilier et décoration", "Vêtements et accessoires", "Sorties et dépenses culturelles",
             ],
         },
-        new() { Nom = PostesSpeciaux.GroupeRevenus, Postes = ["Salaire", PostesSpeciaux.TicketsRestaurant, PostesSpeciaux.EpargneRetrait, "Divers"] },
         new() { Nom = "Transports", Postes = ["Passe Navigo"] },
         new() { Nom = PostesSpeciaux.GroupeEpargne, Postes = [PostesSpeciaux.EpargneDepot] },
         new() { Nom = "Dépenses extraordinaires", Postes = ["Huissier"] },

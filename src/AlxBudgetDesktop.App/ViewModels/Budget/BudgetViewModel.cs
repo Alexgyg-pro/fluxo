@@ -20,6 +20,9 @@ public sealed class BudgetViewModel : TabViewModelBase
 
     public ObservableCollection<LigneBudgetAffichage> Lignes { get; } = [];
 
+    private decimal _soldeCourantCumul;
+    public decimal SoldeCourantCumul { get => _soldeCourantCumul; private set => SetProperty(ref _soldeCourantCumul, value); }
+
     private decimal _soldeEpargneCumul;
     public decimal SoldeEpargneCumul { get => _soldeEpargneCumul; private set => SetProperty(ref _soldeEpargneCumul, value); }
 
@@ -90,6 +93,12 @@ public sealed class BudgetViewModel : TabViewModelBase
         }
         Lignes.Add(LigneBudgetAffichage.PourSolde(budget.SoldeMensuel, budget.SoldeTotal));
 
+        // Le compte courant cumulé n'est pas fourni par BudgetResult (alxBudget ne
+        // l'affichait pas non plus) : on réutilise directement MouvementsMois sur tout
+        // l'historique — même formule que le cumul épargne/TR, juste appliquée au
+        // mouvement "courant" plutôt qu'à un poste dédié.
+        var recettes = SoldesService.PostesRecette(groupes);
+        SoldeCourantCumul = SoldesService.MouvementsMois(achatsHistorique, recettes).Courant;
         SoldeEpargneCumul = budget.SoldeEpargne;
         SoldeTicketsRestaurantCumul = budget.SoldeTicketsRestaurant;
     }

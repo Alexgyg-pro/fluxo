@@ -134,6 +134,12 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
             <Border BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1" CornerRadius="4" Padding="16" Margin="0,0,16,0">
                 <StackPanel>
+                    <TextBlock Text="🏦 Solde compte courant (cumul)" Foreground="{StaticResource BrosseAtténuee}" Margin="0,0,0,6" />
+                    <TextBlock Text="{Binding SoldeCourantCumul, StringFormat={}{0:0.00} €}" FontSize="20" FontWeight="SemiBold" />
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1" CornerRadius="4" Padding="16" Margin="0,0,16,0">
+                <StackPanel>
                     <TextBlock Text="💰 Solde épargne (cumul)" Foreground="{StaticResource BrosseAtténuee}" Margin="0,0,0,6" />
                     <TextBlock Text="{Binding SoldeEpargneCumul, StringFormat={}{0:0.00} €}" FontSize="20" FontWeight="SemiBold" />
                 </StackPanel>
@@ -150,8 +156,9 @@
              en colonnes. Lecture seule, les cellules des mois projetés (moyenne des
              mois passés renseignés) sont teintées en orange. -->
         <DataGrid Grid.Row="1" ItemsSource="{Binding Lignes}" AutoGenerateColumns="False" IsReadOnly="True"
-                  HeadersVisibility="Column" GridLinesVisibility="Horizontal" CanUserAddRows="False"
-                  CanUserReorderColumns="False" CanUserResizeRows="False">
+                  HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="{StaticResource BrosseLigneGrille}"
+                  CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeRows="False">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Style.Triggers>

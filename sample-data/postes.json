@@ -1,5 +1,14 @@
 [
   {
+    "nom": "Revenus",
+    "postes": [
+      "Salaire",
+      "Tickets restaurant",
+      "Épargne (retrait)",
+      "Divers"
+    ]
+  },
+  {
     "nom": "Dépenses incontournables",
     "postes": [
       "Loyer + charges",
@@ -23,15 +32,6 @@
       "Produit de nettoyage",
       "Bureautique et informatique",
       "Appareils et ustensiles de cuisine"
-    ]
-  },
-  {
-    "nom": "Revenus",
-    "postes": [
-      "Salaire",
-      "Tickets restaurant",
-      "Épargne (retrait)",
-      "Divers"
     ]
   },
   {
