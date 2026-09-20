@@ -18,6 +18,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <conv:BoolToVisibilityConverter x:Key="ConvertisseurBoolVersVisibilite" />
+            <conv:DateOnlyToDateTimeConverter x:Key="ConvertisseurDateOnlyVersDateTime" />
             <!-- Routage des onglets : le ContentControl du shell affiche l'onglet
                  sélectionné, WPF choisit automatiquement le DataTemplate en fonction
                  du type concret du ViewModel — pas de routeur explicite. -->

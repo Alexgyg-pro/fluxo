@@ -1,4 +1,5 @@
 using System.Windows;
+using AlxBudgetDesktop.App.Mvvm;
 using AlxBudgetDesktop.App.ViewModels.Shell;
 using AlxBudgetDesktop.App.Views.Shell;
 using AlxBudgetDesktop.Data.Csv;
@@ -26,8 +27,13 @@ public partial class App : Application
 
         var configRepository = new ConfigRepository(chemins, store);
         var validationsRepository = new ValidationsRepository(chemins, store);
+        var postesRepository = new PostesRepository(chemins, store);
+        var achatsRepository = new AchatsRepository(chemins, store);
+        var soldesRepository = new SoldesRepository(chemins, store);
+        var dialogService = new DialogService();
 
-        var mainWindowViewModel = new MainWindowViewModel(configRepository, validationsRepository);
+        var mainWindowViewModel = new MainWindowViewModel(
+            configRepository, validationsRepository, postesRepository, achatsRepository, soldesRepository, dialogService);
 
         var mainWindow = new MainWindow { DataContext = mainWindowViewModel };
         mainWindow.Show();

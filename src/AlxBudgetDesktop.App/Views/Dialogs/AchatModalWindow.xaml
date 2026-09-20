@@ -1,0 +1,125 @@
+<Window x:Class="AlxBudgetDesktop.App.Views.Dialogs.AchatModalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dlg="clr-namespace:AlxBudgetDesktop.App.ViewModels.Dialogs"
+        xmlns:models="clr-namespace:AlxBudgetDesktop.Domain.Models;assembly=AlxBudgetDesktop.Domain"
+        Title="{Binding Titre}" Width="520" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="700">
+    <StackPanel Margin="20">
+
+        <TextBlock Text="{Binding Titre}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16" />
+
+        <Grid Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Date d'achat" Margin="0,0,0,4" />
+                <DatePicker SelectedDate="{Binding DateAchat, Converter={StaticResource ConvertisseurDateOnlyVersDateTime}}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Montant (€)" Margin="0,0,0,4" />
+                <TextBox Text="{Binding MontantTexte, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Text="Étiquette" Margin="0,0,0,4" />
+        <TextBox Text="{Binding Etiquette, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10" />
+
+        <StackPanel Visibility="{Binding AfficheSelecteurCompte, Converter={StaticResource ConvertisseurBoolVersVisibilite}}"
+                    Margin="0,0,0,10">
+            <TextBlock Text="Compte" Margin="0,0,0,4" />
+            <ComboBox SelectedValue="{Binding Compte}" SelectedValuePath="Tag">
+                <ComboBoxItem Content="Compte courant" Tag="{x:Static models:Compte.Courant}" />
+                <ComboBoxItem Content="Carte tickets restaurant" Tag="{x:Static models:Compte.TicketRestaurant}" />
+            </ComboBox>
+        </StackPanel>
+
+        <TextBlock Text="Répartition par poste" FontWeight="SemiBold" Margin="0,8,0,6" />
+
+        <ItemsControl ItemsSource="{Binding LignesPostes}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type dlg:LignePosteViewModel}">
+                    <Grid Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="18" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="28" />
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox Grid.Column="0"
+                                  ItemsSource="{Binding DataContext.PostesDisponibles, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                  SelectedItem="{Binding PosteSelectionne}" />
+
+                        <TextBlock Grid.Column="1" Text="−" FontWeight="Bold" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" Foreground="{StaticResource BrosseDanger}"
+                                   Visibility="{Binding EstRemise, Converter={StaticResource ConvertisseurBoolVersVisibilite}}"
+                                   ToolTip="Ce poste est une remise : le montant saisi en positif est déduit du total." />
+
+                        <TextBox Grid.Column="2" Text="{Binding MontantTexte, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <Button Grid.Column="3" Content="✕"
+                                Command="{Binding DataContext.SupprimerLignePosteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding}"
+                                ToolTip="Retirer ce poste" />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
+            <Button Content="+ Ajouter un poste" Command="{Binding AjouterLignePosteCommand}" Margin="0,0,8,0" Padding="8,4" />
+            <Button Content="Compléter le reste" Command="{Binding CompleterLeResteCommand}" Padding="8,4" />
+        </StackPanel>
+
+        <TextBlock Text="{Binding SommeMessage}" Margin="0,0,0,10">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SommeValide}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <Expander Header="Infos bancaires (facultatif)" Margin="0,0,0,10">
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Date de prélèvement" Margin="0,0,0,4" />
+                    <TextBox Text="{Binding DatePrelevementTexte}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Raison sociale" Margin="0,0,0,4" />
+                    <TextBox Text="{Binding RaisonSociale}" />
+                </StackPanel>
+            </Grid>
+        </Expander>
+
+        <TextBlock Text="{Binding MessageErreur}" Foreground="{StaticResource BrosseDanger}"
+                   TextWrapping="Wrap" Margin="0,0,0,10"
+                   Visibility="{Binding AMessageErreur, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Annuler" Command="{Binding AnnulerCommand}" Padding="12,6" Margin="0,0,8,0" IsCancel="True" />
+            <Button Content="Enregistrer" Command="{Binding EnregistrerCommand}" Padding="12,6" IsDefault="True" />
+        </StackPanel>
+
+    </StackPanel>
+    </ScrollViewer>
+</Window>

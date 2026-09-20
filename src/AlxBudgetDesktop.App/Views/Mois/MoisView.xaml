@@ -3,9 +3,182 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450">
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600">
+
+    <UserControl.Resources>
+        <!-- Une ligne "libellé / valeur" du bandeau de soldes. -->
+        <Style x:Key="StyleLigneSolde" TargetType="Grid">
+            <Setter Property="Margin" Value="0,2" />
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
-        <TextBlock Text="{Binding Titre, StringFormat='Onglet {0} — écran à venir'}"
-                   FontSize="18" Margin="24" Foreground="{StaticResource BrosseAtténuee}" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Bandeau des soldes : vue normale uniquement (pas de calage à ce stade). -->
+        <Border Grid.Row="0" BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1"
+                CornerRadius="4" Padding="16" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Compte courant" FontWeight="SemiBold" Margin="0,0,0,6" />
+                    <Grid Style="{StaticResource StyleLigneSolde}">
+                        <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding OuvertureCourant, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid Style="{StaticResource StyleLigneSolde}">
+                        <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding MouvementsCourant, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
+                        <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding DisponibleCourant, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="24,0,0,0">
+                    <TextBlock Text="Carte TR" FontWeight="SemiBold" Margin="0,0,0,6" />
+                    <Grid Style="{StaticResource StyleLigneSolde}">
+                        <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding OuvertureTr, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid Style="{StaticResource StyleLigneSolde}">
+                        <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding MouvementsTr, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
+                        <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding DisponibleTr, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="24,0,0,0">
+                    <TextBlock Text="Épargne" FontWeight="SemiBold" Margin="0,0,0,6" />
+                    <Grid Style="{StaticResource StyleLigneSolde}">
+                        <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding OuvertureEpargne, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid Style="{StaticResource StyleLigneSolde}">
+                        <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding MouvementsEpargne, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
+                        <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                        <TextBlock Text="{Binding DisponibleEpargne, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Titre + boutons d'ajout (haut). -->
+        <DockPanel Grid.Row="1" Margin="0,0,0,12">
+            <TextBlock Text="{Binding NomMois}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="+ Ajouter une dépense" Command="{Binding AjouterDepenseCommand}" Padding="10,6" Margin="0,0,8,0" />
+                <Button Content="+ Ajouter une recette" Command="{Binding AjouterRecetteCommand}" Padding="10,6" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Tableau des opérations. -->
+        <DataGrid Grid.Row="2" ItemsSource="{Binding Achats}" AutoGenerateColumns="False" IsReadOnly="True"
+                  HeadersVisibility="Column" GridLinesVisibility="Horizontal" CanUserAddRows="False"
+                  CanUserReorderColumns="False" CanUserResizeRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Date" Binding="{Binding DateAchat, StringFormat=dd/MM/yyyy}" Width="Auto" />
+
+                <DataGridTemplateColumn Header="Étiquette" Width="180">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Etiquette}" />
+                                <TextBlock Text=" recette" FontSize="11" Foreground="{StaticResource BrosseSucces}"
+                                           VerticalAlignment="Center" Margin="4,0,0,0"
+                                           Visibility="{Binding EstRecette, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Postes" Binding="{Binding PostesAffichage}" Width="*" />
+
+                <DataGridTemplateColumn Header="Montant" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding MontantAchat, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding EstRecette}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Compte" Binding="{Binding CompteAffiche}" Width="Auto" />
+
+                <DataGridTemplateColumn Header="Actions" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="✎" Padding="6,2" Margin="0,0,4,0" ToolTip="Modifier"
+                                        Command="{Binding DataContext.ModifierCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" />
+                                <Button Content="✕" Padding="6,2" ToolTip="Supprimer" Foreground="{StaticResource BrosseDanger}"
+                                        Command="{Binding DataContext.SupprimerCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Totaux + boutons d'ajout (bas, toujours visibles même liste vide). -->
+        <Grid Grid.Row="3" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Dépenses : " />
+                <TextBlock Text="{Binding TotalDepenses, StringFormat={}{0:0.00} €}" />
+                <TextBlock Text="Recettes : " Margin="20,0,0,0" />
+                <TextBlock Text="{Binding TotalRecettes, StringFormat={}{0:0.00} €}" Foreground="{StaticResource BrosseSucces}" />
+                <TextBlock Text="Solde du mois : " Margin="20,0,0,0" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding SoldeMois, StringFormat={}{0:0.00} €}" FontWeight="SemiBold">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SoldeMoisPositif}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="+ Ajouter une dépense" Command="{Binding AjouterDepenseCommand}" Padding="10,6" Margin="0,0,8,0" />
+                <Button Content="+ Ajouter une recette" Command="{Binding AjouterRecetteCommand}" Padding="10,6" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
