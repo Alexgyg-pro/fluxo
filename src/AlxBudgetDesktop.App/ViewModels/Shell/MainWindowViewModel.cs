@@ -42,14 +42,36 @@ public sealed class MainWindowViewModel : ObservableObject
         get => _ongletSelectionne;
         set
         {
-            if (SetProperty(ref _ongletSelectionne, value) && value is BudgetViewModel budget)
+            var ancien = _ongletSelectionne;
+            if (!SetProperty(ref _ongletSelectionne, value))
             {
-                // Rafraîchit le tableau à chaque activation de l'onglet, pour refléter
-                // les saisies faites depuis les onglets mois sans relancer l'appli.
-                budget.Rafraichir();
+                return;
+            }
+
+            // EstSelectionne piloté ici, explicitement, sur les deux onglets concernés —
+            // c'est ce qui remplace le binding SelectedItem de ListBox (cf. TabViewModelBase).
+            if (ancien is not null)
+            {
+                ancien.EstSelectionne = false;
+            }
+            value.EstSelectionne = true;
+
+            // Rafraîchit le contenu à chaque activation de l'onglet, pour refléter les
+            // changements faits depuis un autre onglet (saisies, édition des postes en
+            // Admin...) sans avoir à relancer l'application.
+            switch (value)
+            {
+                case BudgetViewModel budget:
+                    budget.Rafraichir();
+                    break;
+                case MoisViewModel mois:
+                    mois.Rafraichir();
+                    break;
             }
         }
     }
+
+    public RelayCommand<TabViewModelBase> SelectionnerOngletCommand { get; }
 
     public MainWindowViewModel(
         ConfigRepository configRepository,
@@ -76,7 +98,16 @@ public sealed class MainWindowViewModel : ObservableObject
         OngletsAutres.Add(new ImportViewModel());
         OngletsAutres.Add(adminViewModel);
 
+        SelectionnerOngletCommand = new RelayCommand<TabViewModelBase>(onglet =>
+        {
+            if (onglet is not null)
+            {
+                OngletSelectionne = onglet;
+            }
+        });
+
         _ongletSelectionne = ChoisirOngletParDefaut();
+        _ongletSelectionne.EstSelectionne = true;
     }
 
     private void ConstruireOngletsMois()

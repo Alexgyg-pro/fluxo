@@ -4,31 +4,32 @@
     "postes": [
       "Salaire",
       "Tickets restaurant",
-      "Épargne (retrait)",
+      "\u00C9pargne (retrait)",
       "Divers"
     ]
   },
   {
-    "nom": "Dépenses incontournables",
+    "nom": "D\u00E9penses incontournables",
     "postes": [
-      "Loyer + charges",
+      "Loyer \u002B charges",
       "EDF",
       "Box",
-      "Téléphone portable",
+      "T\u00E9l\u00E9phone portable",
       "Compte Alyssa",
-      "Taxes et Impôts"
+      "Taxes et Imp\u00F4ts",
+      "Gains poker"
     ]
   },
   {
-    "nom": "Dépenses domestiques",
+    "nom": "D\u00E9penses domestiques",
     "postes": [
       "Alimentation",
       "Restauration",
       "Alcool",
-      "Mobilier et décoration",
-      "Vêtements et accessoires",
-      "Sorties et dépenses culturelles",
-      "Produits d'hygiène",
+      "Mobilier et d\u00E9coration",
+      "V\u00EAtements et accessoires",
+      "Sorties et d\u00E9penses culturelles",
+      "Produits d\u0027hygi\u00E8ne",
       "Produit de nettoyage",
       "Bureautique et informatique",
       "Appareils et ustensiles de cuisine"
@@ -41,20 +42,20 @@
     ]
   },
   {
-    "nom": "Épargne",
+    "nom": "\u00C9pargne",
     "postes": [
-      "Épargne (dépôt)"
+      "\u00C9pargne (d\u00E9p\u00F4t)"
     ]
   },
   {
-    "nom": "Dépenses extraordinaires",
+    "nom": "D\u00E9penses extraordinaires",
     "postes": [
       "Huissier",
       "La poste, courrier"
     ]
   },
   {
-    "nom": "Dépenses diverses",
+    "nom": "D\u00E9penses diverses",
     "postes": [
       "Frais bancaires",
       "Retraits Guichet automatique"
@@ -63,13 +64,19 @@
   {
     "nom": "Remises",
     "postes": [
-      "Cagnottes fidélité"
+      "Cagnottes fid\u00E9lit\u00E9"
     ]
   },
   {
     "nom": "Alyssa",
     "postes": [
-      "Scolarité"
+      "Scolarit\u00E9"
+    ]
+  },
+  {
+    "nom": "Appartement",
+    "postes": [
+      "Charges"
     ]
   }
 ]
