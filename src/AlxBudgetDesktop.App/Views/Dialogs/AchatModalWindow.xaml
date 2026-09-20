@@ -64,8 +64,7 @@
                                 <GroupStyle>
                                     <GroupStyle.HeaderTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource BrosseAtténuee}"
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13"
                                                        Margin="4,4,0,2" IsHitTestVisible="False" />
                                         </DataTemplate>
                                     </GroupStyle.HeaderTemplate>
