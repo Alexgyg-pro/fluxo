@@ -13,3 +13,12 @@ AIPLAN.md
 # Garde-fou : un vrai dossier "data" ne doit jamais être versionné ici
 # (les données synthétiques de test vivent dans sample-data/, jamais dans data/)
 /data/
+
+# sample-data/ : seul postes.json est une vraie donnée d'exemple à versionner
+# (jeu de postes de départ). Le reste est de l'état généré/modifié à l'usage
+# au fil des tests dans l'appli, pas du contenu à figer dans l'historique.
+/sample-data/config.json
+/sample-data/achats-*.jsonl
+/sample-data/soldes-*.json
+/sample-data/validations-*.json
+/sample-data/beneficiaires.json
