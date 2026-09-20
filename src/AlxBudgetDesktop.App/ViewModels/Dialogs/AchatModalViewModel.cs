@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.Windows.Data;
 using AlxBudgetDesktop.App.Mvvm;
 using AlxBudgetDesktop.Data.Repositories;
 using AlxBudgetDesktop.Domain;
@@ -37,7 +38,10 @@ public sealed class AchatModalViewModel : ModalViewModelBase
 
     public bool AfficheSelecteurCompte => Mode == ModeAchat.Depense;
 
-    public IReadOnlyList<string> PostesDisponibles { get; }
+    /// <summary>Vue groupée par nom de groupe (Dépenses incontournables, Dépenses
+    /// domestiques, ...) pour l'affichage en liste déroulante avec en-têtes non
+    /// cliquables — cf. GroupStyle sur le ComboBox dans AchatModalWindow.xaml.</summary>
+    public ICollectionView PostesGroupes { get; }
 
     public ObservableCollection<LignePosteViewModel> LignesPostes { get; } = [];
 
@@ -133,9 +137,17 @@ public sealed class AchatModalViewModel : ModalViewModelBase
         _achatsRepository = achatsRepository;
         _achatExistant = achatExistant;
 
-        PostesDisponibles = mode == ModeAchat.Recette
-            ? groupes.Where(g => g.Nom == PostesSpeciaux.GroupeRevenus).SelectMany(g => g.Postes).ToList()
-            : groupes.Where(g => g.Nom != PostesSpeciaux.GroupeRevenus).SelectMany(g => g.Postes).ToList();
+        var groupesPertinents = mode == ModeAchat.Recette
+            ? groupes.Where(g => g.Nom == PostesSpeciaux.GroupeRevenus)
+            : groupes.Where(g => g.Nom != PostesSpeciaux.GroupeRevenus);
+
+        var postesAvecGroupe = groupesPertinents
+            .SelectMany(g => g.Postes.Select(p => new PosteOption { Poste = p, Groupe = g.Nom }))
+            .ToList();
+
+        var vueGroupee = CollectionViewSource.GetDefaultView(postesAvecGroupe);
+        vueGroupee.GroupDescriptions.Add(new PropertyGroupDescription(nameof(PosteOption.Groupe)));
+        PostesGroupes = vueGroupee;
 
         // Les commandes doivent exister AVANT tout ajout à LignesPostes ci-dessous :
         // CollectionChanged déclenche RecalculerEtat(), qui référence EnregistrerCommand.

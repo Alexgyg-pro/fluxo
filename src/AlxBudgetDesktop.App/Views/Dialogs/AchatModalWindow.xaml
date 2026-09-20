@@ -20,7 +20,8 @@
 
             <StackPanel Grid.Column="0">
                 <TextBlock Text="Date d'achat" Margin="0,0,0,4" />
-                <DatePicker SelectedDate="{Binding DateAchat, Converter={StaticResource ConvertisseurDateOnlyVersDateTime}}" />
+                <DatePicker SelectedDate="{Binding DateAchat, Converter={StaticResource ConvertisseurDateOnlyVersDateTime}}"
+                            DisplayDate="{Binding DateAchat, Converter={StaticResource ConvertisseurDateOnlyVersDateTime}, Mode=OneWay}" />
             </StackPanel>
 
             <StackPanel Grid.Column="2">
@@ -55,8 +56,22 @@
                         </Grid.ColumnDefinitions>
 
                         <ComboBox Grid.Column="0"
-                                  ItemsSource="{Binding DataContext.PostesDisponibles, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                  SelectedItem="{Binding PosteSelectionne}" />
+                                  ItemsSource="{Binding DataContext.PostesGroupes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                  DisplayMemberPath="Poste"
+                                  SelectedValuePath="Poste"
+                                  SelectedValue="{Binding PosteSelectionne}">
+                            <ComboBox.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.HeaderTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource BrosseAtténuee}"
+                                                       Margin="4,4,0,2" IsHitTestVisible="False" />
+                                        </DataTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                </GroupStyle>
+                            </ComboBox.GroupStyle>
+                        </ComboBox>
 
                         <TextBlock Grid.Column="1" Text="−" FontWeight="Bold" HorizontalAlignment="Center"
                                    VerticalAlignment="Center" Foreground="{StaticResource BrosseDanger}"
