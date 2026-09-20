@@ -76,7 +76,14 @@
   {
     "nom": "Appartement",
     "postes": [
-      "Charges"
+      "Charges",
+      "Imp\u00F4ts"
+    ]
+  },
+  {
+    "nom": "Nouveau groupe",
+    "postes": [
+      "Nouveau poste"
     ]
   }
 ]
