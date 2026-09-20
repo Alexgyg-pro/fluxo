@@ -121,7 +121,14 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="StyleCelluleTotal" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}" />
+        <!-- Colonne Total : plus marquée que le reste du tableau (fond distinct,
+             bordure gauche, texte gras en permanence, pas seulement groupe/solde). -->
+        <Style x:Key="StyleCelluleTotal" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Setter Property="Background" Value="#F2F2F2" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrosseBordure}" />
+            <Setter Property="BorderThickness" Value="1,0,0,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -166,7 +173,9 @@
                             <Setter Property="Background" Value="#F5F5F5" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding EstSolde}" Value="True">
-                            <Setter Property="Background" Value="#EEEEEE" />
+                            <Setter Property="Background" Value="#E2E2E2" />
+                            <Setter Property="BorderBrush" Value="{StaticResource BrosseAtténuee}" />
+                            <Setter Property="BorderThickness" Value="0,2,0,0" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
