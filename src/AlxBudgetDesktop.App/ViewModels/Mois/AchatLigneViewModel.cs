@@ -5,7 +5,7 @@ namespace AlxBudgetDesktop.App.ViewModels.Mois;
 /// <summary>Habillage d'affichage d'un <see cref="Achat"/> pour la ligne du tableau des
 /// opérations du mois — la classification recette/dépense et le formatage restent ici,
 /// pas dans le modèle de domaine.</summary>
-public sealed class AchatLigneViewModel(Achat achat, bool estRecette)
+public sealed class AchatLigneViewModel(Achat achat, bool estRecette, bool estOrpheline = false)
 {
     public Achat Achat { get; } = achat;
 
@@ -14,6 +14,10 @@ public sealed class AchatLigneViewModel(Achat achat, bool estRecette)
     public string Etiquette => Achat.Etiquette;
     public decimal MontantAchat => Achat.MontantAchat;
     public bool EstRecette { get; } = estRecette;
+
+    /// <summary>Dépense saisie sans ligne correspondante au relevé contrôlé
+    /// ("Absente du relevé") — calculé par le contrôle de rapprochement éphémère.</summary>
+    public bool EstOrpheline { get; } = estOrpheline;
 
     public string CompteAffiche => Achat.Compte == Compte.TicketRestaurant ? "TR" : "courant";
 

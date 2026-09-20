@@ -48,7 +48,7 @@ public sealed class MainWindowViewModel : ObservableObject
             var cleMois = SoldesService.CleMois(Annee, mois);
             OngletsMois.Add(new MoisViewModel(
                 mois, Annee, estValide: validations.ContainsKey(cleMois),
-                postesRepository, achatsRepository, soldesRepository, dialogService));
+                postesRepository, achatsRepository, soldesRepository, validationsRepository, dialogService));
         }
 
         OngletsAutres.Add(new BudgetViewModel());

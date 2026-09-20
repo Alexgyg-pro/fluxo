@@ -7,6 +7,19 @@
 
 ## En cours
 
+### US-003 — Valider le contrôle de rapprochement en conditions réelles
+**En tant qu'**utilisateur, **je veux** tester le contrôle de rapprochement bancaire (bouton "Contrôler avec un relevé") avec un vrai export CSV de ma banque
+**afin de** m'assurer qu'il fonctionne correctement sur mes propres relevés, pas seulement sur des fixtures synthétiques.
+
+**Contexte :** Depuis plusieurs semaines, le PO n'arrive plus à télécharger l'export CSV depuis le site de sa banque (CIC) — le lien mentionné dans NOTICE.md d'alxBudget ("Opérations" → "Télécharger vos dernières opérations") ne fonctionne plus de son côté. Cette fonctionnalité n'a donc jamais pu être testée en conditions réelles, ni côté alxBudget (web) ni côté alxBudgetDesktop. Le code (parseur CSV CIC, algorithme de rapprochement, contrôle éphémère) a été porté fidèlement depuis alxBudget et testé unitairement (32 tests domaine) et avec un CSV synthétique, mais jamais validé sur un vrai relevé.
+
+**Décision PO :** mis en pause, pas bloquant pour la suite du développement. À reprendre dès que l'export CSV redevient accessible. Si la banque a définitivement retiré cette fonctionnalité côté site, il faudra revoir l'approche (autre format d'export si disponible, ou abandon du rapprochement automatique au profit d'une vérification manuelle des opérations) — décision à prendre avec le PO à ce moment-là, pas avant.
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Un export CSV réel de la banque a pu être obtenu.
+- [ ] Le contrôle de rapprochement testé dessus donne des résultats cohérents (matches, orphelines, à saisir) validés manuellement par le PO.
+- [ ] Si l'export CSV n'est plus disponible : décision PO consignée sur l'alternative retenue.
+
 ### US-002 — Chaînage du solde d'ouverture entre années
 **En tant qu'**utilisateur, **je veux** que le solde d'ouverture de janvier reprenne la clôture de décembre de l'année précédente (quand elle existe)
 **afin de** avoir des soldes corrects dès la première consultation d'une nouvelle année, sans devoir caler manuellement chaque janvier.
