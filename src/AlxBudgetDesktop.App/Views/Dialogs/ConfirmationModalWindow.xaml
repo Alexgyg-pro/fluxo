@@ -1,0 +1,25 @@
+<Window x:Class="AlxBudgetDesktop.App.Views.Dialogs.ConfirmationModalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding Titre}" Width="380" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <StackPanel Margin="20">
+        <TextBlock Text="{Binding Titre}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding EstSucces}" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,16" />
+
+        <Button Content="OK" Command="{Binding OkCommand}" HorizontalAlignment="Right" Padding="16,6" IsDefault="True" IsCancel="True" />
+    </StackPanel>
+</Window>

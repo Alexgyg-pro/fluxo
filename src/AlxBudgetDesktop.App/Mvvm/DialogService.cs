@@ -15,6 +15,9 @@ public sealed class DialogService : IDialogService
     public bool ShowCalageModal(CalageModalViewModel viewModel)
         => ShowModal(new CalageModalWindow { DataContext = viewModel }, viewModel);
 
+    public void ShowConfirmation(ConfirmationModalViewModel viewModel)
+        => ShowModal(new ConfirmationModalWindow { DataContext = viewModel }, viewModel);
+
     private static bool ShowModal(Window fenetre, ModalViewModelBase viewModel)
     {
         var resultat = false;
