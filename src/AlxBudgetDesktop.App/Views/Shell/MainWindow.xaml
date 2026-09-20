@@ -9,28 +9,58 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Barre d'onglets custom : pas de TabControl natif, pour rester fidèle au
-             shell "onglets maison" côté React (App.tsx) et permettre une pastille
-             de validation libre sur chaque en-tête de mois. -->
-        <ListBox Grid.Row="0"
-                 Style="{StaticResource StyleBarreOnglets}"
-                 ItemContainerStyle="{StaticResource StyleOngletItem}"
-                 ItemsSource="{Binding Onglets}"
-                 SelectedItem="{Binding OngletSelectionne, Mode=TwoWay}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Titre}" />
-                        <TextBlock Text=" ✓" Foreground="{StaticResource BrosseSucces}" FontWeight="Bold"
-                                   Visibility="{Binding EstValide, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <!-- Bandeau titre : nom de l'application à gauche, année gérée à droite. -->
+        <Grid Grid.Row="0" Margin="24,20,24,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="alxBudgetDesktop" FontSize="20" FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding Annee, StringFormat='Année {0}'}" FontSize="16"
+                       VerticalAlignment="Center" Foreground="{StaticResource BrosseAtténuee}" />
+        </Grid>
 
-        <ContentControl Grid.Row="1" Content="{Binding OngletSelectionne}" Margin="0" />
+        <!-- Barre d'onglets custom : pas de TabControl natif, pour rester fidèle au
+             shell "onglets maison" côté React (App.tsx). Deux groupes distincts
+             partageant la même sélection : les mois à gauche, Budget/Import/Admin
+             à droite (DockPanel pousse chaque groupe vers son bord). -->
+        <Border Grid.Row="1" Margin="24,0,24,0" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BrosseBordure}">
+        <DockPanel LastChildFill="False">
+            <ListBox DockPanel.Dock="Left"
+                     Style="{StaticResource StyleBarreOnglets}"
+                     ItemContainerStyle="{StaticResource StyleOngletItem}"
+                     ItemsSource="{Binding OngletsMois}"
+                     SelectedItem="{Binding OngletSelectionne, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Titre}" />
+                            <TextBlock Text=" ✓" Foreground="{StaticResource BrosseSucces}" FontWeight="Bold"
+                                       Visibility="{Binding EstValide, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <ListBox DockPanel.Dock="Right"
+                     Style="{StaticResource StyleBarreOnglets}"
+                     ItemContainerStyle="{StaticResource StyleOngletItem}"
+                     ItemsSource="{Binding OngletsAutres}"
+                     SelectedItem="{Binding OngletSelectionne, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Titre}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+        </Border>
+
+        <ContentControl Grid.Row="2" Content="{Binding OngletSelectionne}" Margin="24,16,24,24" />
     </Grid>
 </Window>

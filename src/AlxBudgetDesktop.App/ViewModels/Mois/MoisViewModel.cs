@@ -21,7 +21,7 @@ public sealed class MoisViewModel : TabViewModelBase
     public int Annee { get; }
 
     public MoisViewModel(int mois, int annee, bool estValide)
-        : base($"{NomsMois[mois][..3]} {annee}", estValide)
+        : base(NomsMois[mois][..3], estValide)
     {
         Mois = mois;
         Annee = annee;
