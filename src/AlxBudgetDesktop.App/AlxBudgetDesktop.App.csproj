@@ -13,4 +13,12 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <!-- Copie le mode d'emploi utilisateur (suivi par git, à la racine du dépôt) dans
+       le dossier de publication à chaque "dotnet publish", pour ne jamais distribuer
+       une version obsolète du README.txt à côté de l'exécutable. -->
+  <Target Name="CopierReadmeUtilisateur" AfterTargets="Publish">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\..\README-utilisateur.txt"
+          DestinationFiles="$(PublishDir)README.txt" />
+  </Target>
+
 </Project>
