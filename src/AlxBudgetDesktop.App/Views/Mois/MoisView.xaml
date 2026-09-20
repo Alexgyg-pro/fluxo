@@ -196,7 +196,7 @@
                         <TextBlock VerticalAlignment="Center" Margin="0,0,8,0"
                                    Visibility="{Binding EstValide, Converter={StaticResource ConvertisseurBoolVersVisibilite}}">
                             <Run Text="✓ Validé le " Foreground="{StaticResource BrosseSucces}" FontWeight="SemiBold" />
-                            <Run Text="{Binding DateValidation, StringFormat=dd/MM/yyyy}" Foreground="{StaticResource BrosseSucces}" FontWeight="SemiBold" />
+                            <Run Text="{Binding DateValidation, StringFormat=dd/MM/yyyy, Mode=OneWay}" Foreground="{StaticResource BrosseSucces}" FontWeight="SemiBold" />
                         </TextBlock>
                         <Button Content="Dévalider" Command="{Binding DevaliderCommand}" Padding="8,4"
                                 Visibility="{Binding EstValide, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
