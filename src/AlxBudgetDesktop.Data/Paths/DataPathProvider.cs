@@ -3,8 +3,12 @@ namespace AlxBudgetDesktop.Data.Paths;
 /// <summary>
 /// Résout le dossier de données utilisé par l'application. Priorité :
 /// 1. Variable d'environnement ALXBUDGET_DESKTOP_DATA_DIR
-/// 2. Chemin fourni explicitement au constructeur (ex. lu depuis appsettings.json)
-/// 3. Dossier "sample-data" à côté de l'exécutable
+/// 2. Chemin fourni explicitement au constructeur
+/// 3. Dossier "sample-data" à la racine du dépôt, si on le détecte (présence d'un
+///    .sln en remontant depuis l'exécutable) — le cas normal en développement
+///    (dotnet run), pour que les données survivent aux recompilations.
+/// 4. Dossier "sample-data" à côté de l'exécutable (cas d'un exécutable publié,
+///    hors dépôt, où aucun .sln n'est trouvable).
 ///
 /// Aucune valeur par défaut ne doit jamais référencer le dossier data\ réel
 /// d'alxBudget — les données réelles ne sont pointées qu'après validation
@@ -19,16 +23,36 @@ public sealed class DataPathProvider
     public DataPathProvider(string? cheminConfigure = null)
     {
         var cheminEnv = Environment.GetEnvironmentVariable(EnvVarName);
+        var racineDepot = TrouverRacineDepot(AppContext.BaseDirectory);
 
         DossierDonnees = !string.IsNullOrWhiteSpace(cheminEnv)
             ? cheminEnv
             : !string.IsNullOrWhiteSpace(cheminConfigure)
                 ? cheminConfigure
-                : Path.Combine(AppContext.BaseDirectory, "sample-data");
+                : racineDepot is not null
+                    ? Path.Combine(racineDepot, "sample-data")
+                    : Path.Combine(AppContext.BaseDirectory, "sample-data");
 
         DossierDonnees = Path.GetFullPath(DossierDonnees);
         Directory.CreateDirectory(DossierDonnees);
     }
 
     public string CheminFichier(string nomFichier) => Path.Combine(DossierDonnees, nomFichier);
+
+    /// <summary>Remonte l'arborescence depuis <paramref name="depart"/> à la recherche
+    /// d'un fichier .sln, marqueur de la racine du dépôt. Renvoie null si aucun n'est
+    /// trouvé (cas d'un exécutable publié, exécuté hors du dépôt source).</summary>
+    private static string? TrouverRacineDepot(string depart)
+    {
+        var dossier = new DirectoryInfo(depart);
+        while (dossier is not null)
+        {
+            if (dossier.GetFiles("*.sln").Length > 0)
+            {
+                return dossier.FullName;
+            }
+            dossier = dossier.Parent;
+        }
+        return null;
+    }
 }

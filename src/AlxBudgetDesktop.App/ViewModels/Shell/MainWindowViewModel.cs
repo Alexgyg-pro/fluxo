@@ -5,6 +5,7 @@ using AlxBudgetDesktop.App.ViewModels.Budget;
 using AlxBudgetDesktop.App.ViewModels.Import;
 using AlxBudgetDesktop.App.ViewModels.Mois;
 using AlxBudgetDesktop.Data.Repositories;
+using AlxBudgetDesktop.Domain.Services;
 
 namespace AlxBudgetDesktop.App.ViewModels.Shell;
 
@@ -31,21 +32,32 @@ public sealed class MainWindowViewModel : ObservableObject
         set => SetProperty(ref _ongletSelectionne, value);
     }
 
-    public MainWindowViewModel(ConfigRepository configRepository, ValidationsRepository validationsRepository)
+    public MainWindowViewModel(
+        ConfigRepository configRepository,
+        ValidationsRepository validationsRepository,
+        PostesRepository postesRepository,
+        AchatsRepository achatsRepository,
+        SoldesRepository soldesRepository,
+        IDialogService dialogService)
     {
         Annee = configRepository.Charger().AnneeCourante;
         var validations = validationsRepository.Charger(Annee);
 
         for (var mois = 0; mois < 12; mois++)
         {
-            var cleMois = Domain.Services.SoldesService.CleMois(Annee, mois);
-            OngletsMois.Add(new MoisViewModel(mois, Annee, estValide: validations.ContainsKey(cleMois)));
+            var cleMois = SoldesService.CleMois(Annee, mois);
+            OngletsMois.Add(new MoisViewModel(
+                mois, Annee, estValide: validations.ContainsKey(cleMois),
+                postesRepository, achatsRepository, soldesRepository, dialogService));
         }
 
         OngletsAutres.Add(new BudgetViewModel());
         OngletsAutres.Add(new ImportViewModel());
         OngletsAutres.Add(new AdminViewModel());
 
-        _ongletSelectionne = OngletsMois[0];
+        // Sélectionne le mois courant au lancement (si l'année affichée est bien
+        // l'année civile en cours) ; sinon janvier par défaut.
+        var aujourdhui = DateTime.Now;
+        _ongletSelectionne = aujourdhui.Year == Annee ? OngletsMois[aujourdhui.Month - 1] : OngletsMois[0];
     }
 }

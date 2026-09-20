@@ -1,0 +1,75 @@
+[
+  {
+    "nom": "Dépenses incontournables",
+    "postes": [
+      "Loyer + charges",
+      "EDF",
+      "Box",
+      "Téléphone portable",
+      "Compte Alyssa",
+      "Taxes et Impôts"
+    ]
+  },
+  {
+    "nom": "Dépenses domestiques",
+    "postes": [
+      "Alimentation",
+      "Restauration",
+      "Alcool",
+      "Mobilier et décoration",
+      "Vêtements et accessoires",
+      "Sorties et dépenses culturelles",
+      "Produits d'hygiène",
+      "Produit de nettoyage",
+      "Bureautique et informatique",
+      "Appareils et ustensiles de cuisine"
+    ]
+  },
+  {
+    "nom": "Revenus",
+    "postes": [
+      "Salaire",
+      "Tickets restaurant",
+      "Épargne (retrait)",
+      "Divers"
+    ]
+  },
+  {
+    "nom": "Transports",
+    "postes": [
+      "Passe Navigo"
+    ]
+  },
+  {
+    "nom": "Épargne",
+    "postes": [
+      "Épargne (dépôt)"
+    ]
+  },
+  {
+    "nom": "Dépenses extraordinaires",
+    "postes": [
+      "Huissier",
+      "La poste, courrier"
+    ]
+  },
+  {
+    "nom": "Dépenses diverses",
+    "postes": [
+      "Frais bancaires",
+      "Retraits Guichet automatique"
+    ]
+  },
+  {
+    "nom": "Remises",
+    "postes": [
+      "Cagnottes fidélité"
+    ]
+  },
+  {
+    "nom": "Alyssa",
+    "postes": [
+      "Scolarité"
+    ]
+  }
+]
