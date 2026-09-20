@@ -5,12 +5,20 @@
     <ProjectReference Include="..\AlxBudgetDesktop.Data\AlxBudgetDesktop.Data.csproj" />
   </ItemGroup>
 
+  <!-- Incluse comme ressource WPF (pas seulement ApplicationIcon, qui ne couvre que
+       l'icône du fichier .exe dans l'Explorateur) pour que Window.Icon puisse la
+       référencer en pack URI et afficher l'icône dans la barre de titre / Alt-Tab. -->
+  <ItemGroup>
+    <Resource Include="Resources\icone.ico" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\icone.ico</ApplicationIcon>
   </PropertyGroup>
 
   <!-- Copie le mode d'emploi utilisateur (suivi par git, à la racine du dépôt) dans
