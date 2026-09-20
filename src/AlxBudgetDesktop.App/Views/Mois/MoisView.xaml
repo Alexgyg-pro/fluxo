@@ -37,140 +37,154 @@
                 </DockPanel>
 
                 <Grid>
+                    <!-- 5 colonnes égales de 1/5 : les 3 blocs de comptes occupent les colonnes
+                         0 à 2, alignés à gauche ; les colonnes 3 et 4 restent vides, réservées
+                         pour d'éventuels comptes supplémentaires à l'avenir. -->
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Compte courant" FontWeight="SemiBold" Margin="0,0,0,6" />
+                    <Border Grid.Column="0" BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1"
+                            CornerRadius="4" Padding="12" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="Compte courant" FontWeight="SemiBold" Margin="0,0,0,6" />
 
-                        <Grid Style="{StaticResource StyleLigneSolde}" Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibiliteInverse}}">
-                            <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding OuvertureCourant, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
-                        </Grid>
-                        <StackPanel Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibilite}}">
-                            <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Report du mois précédent" HorizontalAlignment="Left" Foreground="{StaticResource BrosseAtténuee}" />
-                                <TextBlock Text="{Binding ReportCourant, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" Foreground="{StaticResource BrosseAtténuee}" />
+                            <Grid Style="{StaticResource StyleLigneSolde}" Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibiliteInverse}}">
+                                <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding OuvertureCourant, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
                             </Grid>
+                            <StackPanel Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibilite}}">
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Report du mois précédent" HorizontalAlignment="Left" Foreground="{StaticResource BrosseAtténuee}" />
+                                    <TextBlock Text="{Binding ReportCourant, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" Foreground="{StaticResource BrosseAtténuee}" />
+                                </Grid>
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Correction" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding CorrectionCourant, StringFormat={}{0:+0.00;-0.00;0.00} €}" HorizontalAlignment="Right">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CorrectionCourantPositive}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Ouverture retenue" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding OuvertureCourant, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+
                             <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Correction" HorizontalAlignment="Left" />
-                                <TextBlock Text="{Binding CorrectionCourant, StringFormat={}{0:+0.00;-0.00;0.00} €}" HorizontalAlignment="Right">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding CorrectionCourantPositive}" Value="True">
-                                                    <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding MouvementsCourant, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
                             </Grid>
-                            <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Ouverture retenue" FontWeight="SemiBold" HorizontalAlignment="Left" />
-                                <TextBlock Text="{Binding OuvertureCourant, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                            <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
+                                <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding DisponibleCourant, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
                             </Grid>
                         </StackPanel>
+                    </Border>
 
-                        <Grid Style="{StaticResource StyleLigneSolde}">
-                            <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding MouvementsCourant, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
-                        </Grid>
-                        <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
-                            <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding DisponibleCourant, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
-                        </Grid>
-                    </StackPanel>
+                    <Border Grid.Column="1" BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1"
+                            CornerRadius="4" Padding="12" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="Carte TR" FontWeight="SemiBold" Margin="0,0,0,6" />
 
-                    <StackPanel Grid.Column="1" Margin="24,0,0,0">
-                        <TextBlock Text="Carte TR" FontWeight="SemiBold" Margin="0,0,0,6" />
-
-                        <Grid Style="{StaticResource StyleLigneSolde}" Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibiliteInverse}}">
-                            <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding OuvertureTr, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
-                        </Grid>
-                        <StackPanel Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibilite}}">
-                            <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Report du mois précédent" HorizontalAlignment="Left" Foreground="{StaticResource BrosseAtténuee}" />
-                                <TextBlock Text="{Binding ReportTr, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" Foreground="{StaticResource BrosseAtténuee}" />
+                            <Grid Style="{StaticResource StyleLigneSolde}" Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibiliteInverse}}">
+                                <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding OuvertureTr, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
                             </Grid>
-                            <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Correction" HorizontalAlignment="Left" />
-                                <TextBlock Text="{Binding CorrectionTr, StringFormat={}{0:+0.00;-0.00;0.00} €}" HorizontalAlignment="Right">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding CorrectionTrPositive}" Value="True">
-                                                    <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                            <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Ouverture retenue" FontWeight="SemiBold" HorizontalAlignment="Left" />
-                                <TextBlock Text="{Binding OuvertureTr, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
-                            </Grid>
-                        </StackPanel>
+                            <StackPanel Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibilite}}">
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Report du mois précédent" HorizontalAlignment="Left" Foreground="{StaticResource BrosseAtténuee}" />
+                                    <TextBlock Text="{Binding ReportTr, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" Foreground="{StaticResource BrosseAtténuee}" />
+                                </Grid>
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Correction" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding CorrectionTr, StringFormat={}{0:+0.00;-0.00;0.00} €}" HorizontalAlignment="Right">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CorrectionTrPositive}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Ouverture retenue" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding OuvertureTr, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
 
-                        <Grid Style="{StaticResource StyleLigneSolde}">
-                            <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding MouvementsTr, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
-                        </Grid>
-                        <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
-                            <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding DisponibleTr, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
-                        </Grid>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2" Margin="24,0,0,0">
-                        <TextBlock Text="Épargne" FontWeight="SemiBold" Margin="0,0,0,6" />
-
-                        <Grid Style="{StaticResource StyleLigneSolde}" Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibiliteInverse}}">
-                            <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding OuvertureEpargne, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
-                        </Grid>
-                        <StackPanel Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibilite}}">
                             <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Report du mois précédent" HorizontalAlignment="Left" Foreground="{StaticResource BrosseAtténuee}" />
-                                <TextBlock Text="{Binding ReportEpargne, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" Foreground="{StaticResource BrosseAtténuee}" />
+                                <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding MouvementsTr, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
                             </Grid>
-                            <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Correction" HorizontalAlignment="Left" />
-                                <TextBlock Text="{Binding CorrectionEpargne, StringFormat={}{0:+0.00;-0.00;0.00} €}" HorizontalAlignment="Right">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding CorrectionEpargnePositive}" Value="True">
-                                                    <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                            <Grid Style="{StaticResource StyleLigneSolde}">
-                                <TextBlock Text="Ouverture retenue" FontWeight="SemiBold" HorizontalAlignment="Left" />
-                                <TextBlock Text="{Binding OuvertureEpargne, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                            <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
+                                <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding DisponibleTr, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
                             </Grid>
                         </StackPanel>
+                    </Border>
 
-                        <Grid Style="{StaticResource StyleLigneSolde}">
-                            <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding MouvementsEpargne, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
-                        </Grid>
-                        <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
-                            <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
-                            <TextBlock Text="{Binding DisponibleEpargne, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
-                        </Grid>
-                    </StackPanel>
+                    <Border Grid.Column="2" BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1"
+                            CornerRadius="4" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="Épargne" FontWeight="SemiBold" Margin="0,0,0,6" />
+
+                            <Grid Style="{StaticResource StyleLigneSolde}" Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibiliteInverse}}">
+                                <TextBlock Text="Ouverture" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding OuvertureEpargne, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
+                            </Grid>
+                            <StackPanel Visibility="{Binding EstCale, Converter={StaticResource ConvertisseurBoolVersVisibilite}}">
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Report du mois précédent" HorizontalAlignment="Left" Foreground="{StaticResource BrosseAtténuee}" />
+                                    <TextBlock Text="{Binding ReportEpargne, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" Foreground="{StaticResource BrosseAtténuee}" />
+                                </Grid>
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Correction" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding CorrectionEpargne, StringFormat={}{0:+0.00;-0.00;0.00} €}" HorizontalAlignment="Right">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{StaticResource BrosseDanger}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CorrectionEpargnePositive}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource BrosseSucces}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                                <Grid Style="{StaticResource StyleLigneSolde}">
+                                    <TextBlock Text="Ouverture retenue" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding OuvertureEpargne, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+
+                            <Grid Style="{StaticResource StyleLigneSolde}">
+                                <TextBlock Text="Mouvements" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding MouvementsEpargne, StringFormat={}{0:0.00} €}" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid Style="{StaticResource StyleLigneSolde}" Margin="0,6,0,0">
+                                <TextBlock Text="Disponible" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding DisponibleEpargne, StringFormat={}{0:0.00} €}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </StackPanel>
         </Border>
