@@ -29,7 +29,15 @@ public sealed class MainWindowViewModel : ObservableObject
     public TabViewModelBase OngletSelectionne
     {
         get => _ongletSelectionne;
-        set => SetProperty(ref _ongletSelectionne, value);
+        set
+        {
+            if (SetProperty(ref _ongletSelectionne, value) && value is BudgetViewModel budget)
+            {
+                // Rafraîchit le tableau à chaque activation de l'onglet, pour refléter
+                // les saisies faites depuis les onglets mois sans relancer l'appli.
+                budget.Rafraichir();
+            }
+        }
     }
 
     public MainWindowViewModel(
@@ -51,7 +59,7 @@ public sealed class MainWindowViewModel : ObservableObject
                 postesRepository, achatsRepository, soldesRepository, validationsRepository, dialogService));
         }
 
-        OngletsAutres.Add(new BudgetViewModel());
+        OngletsAutres.Add(new BudgetViewModel(Annee, postesRepository, achatsRepository));
         OngletsAutres.Add(new ImportViewModel());
         OngletsAutres.Add(new AdminViewModel());
 
