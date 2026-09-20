@@ -11,6 +11,7 @@
     <Color x:Key="CouleurProjeteTexte">#E65100</Color>
     <Color x:Key="CouleurASaisirFond">#E8EAF6</Color>
     <Color x:Key="CouleurBordure">#DDDDDD</Color>
+    <Color x:Key="CouleurLigneGrille">#EFEFEF</Color>
     <Color x:Key="CouleurAtténuee">#6C757D</Color>
 
     <SolidColorBrush x:Key="BrosseSucces" Color="{StaticResource CouleurSucces}" />
@@ -19,6 +20,7 @@
     <SolidColorBrush x:Key="BrosseProjeteTexte" Color="{StaticResource CouleurProjeteTexte}" />
     <SolidColorBrush x:Key="BrosseASaisirFond" Color="{StaticResource CouleurASaisirFond}" />
     <SolidColorBrush x:Key="BrosseBordure" Color="{StaticResource CouleurBordure}" />
+    <SolidColorBrush x:Key="BrosseLigneGrille" Color="{StaticResource CouleurLigneGrille}" />
     <SolidColorBrush x:Key="BrosseAtténuee" Color="{StaticResource CouleurAtténuee}" />
 
 </ResourceDictionary>
