@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using AlxBudgetDesktop.App.Mvvm;
 using AlxBudgetDesktop.App.ViewModels.Admin;
 using AlxBudgetDesktop.App.ViewModels.Budget;
@@ -16,10 +17,20 @@ namespace AlxBudgetDesktop.App.ViewModels.Shell;
 /// DataTemplate keyé par type de ViewModel côté XAML (App.xaml). Les deux groupes
 /// d'onglets sont exposés séparément pour permettre l'alignement gauche/droite de la
 /// barre d'onglets côté vue (mois à gauche, Budget/Import/Admin à droite).
+/// Un changement d'année depuis l'onglet Admin reconstruit entièrement les onglets mois
+/// et l'onglet Budget (postes.json reste partagé, seuls les achats/soldes/validations
+/// sont partitionnés par année).
 /// </summary>
 public sealed class MainWindowViewModel : ObservableObject
 {
-    public int Annee { get; }
+    private readonly PostesRepository _postesRepository;
+    private readonly AchatsRepository _achatsRepository;
+    private readonly SoldesRepository _soldesRepository;
+    private readonly ValidationsRepository _validationsRepository;
+    private readonly IDialogService _dialogService;
+
+    private int _annee;
+    public int Annee { get => _annee; private set => SetProperty(ref _annee, value); }
 
     public ObservableCollection<TabViewModelBase> OngletsMois { get; } = [];
 
@@ -31,14 +42,36 @@ public sealed class MainWindowViewModel : ObservableObject
         get => _ongletSelectionne;
         set
         {
-            if (SetProperty(ref _ongletSelectionne, value) && value is BudgetViewModel budget)
+            var ancien = _ongletSelectionne;
+            if (!SetProperty(ref _ongletSelectionne, value))
             {
-                // Rafraîchit le tableau à chaque activation de l'onglet, pour refléter
-                // les saisies faites depuis les onglets mois sans relancer l'appli.
-                budget.Rafraichir();
+                return;
+            }
+
+            // EstSelectionne piloté ici, explicitement, sur les deux onglets concernés —
+            // c'est ce qui remplace le binding SelectedItem de ListBox (cf. TabViewModelBase).
+            if (ancien is not null)
+            {
+                ancien.EstSelectionne = false;
+            }
+            value.EstSelectionne = true;
+
+            // Rafraîchit le contenu à chaque activation de l'onglet, pour refléter les
+            // changements faits depuis un autre onglet (saisies, édition des postes en
+            // Admin...) sans avoir à relancer l'application.
+            switch (value)
+            {
+                case BudgetViewModel budget:
+                    budget.Rafraichir();
+                    break;
+                case MoisViewModel mois:
+                    mois.Rafraichir();
+                    break;
             }
         }
     }
+
+    public RelayCommand<TabViewModelBase> SelectionnerOngletCommand { get; }
 
     public MainWindowViewModel(
         ConfigRepository configRepository,
@@ -48,24 +81,68 @@ public sealed class MainWindowViewModel : ObservableObject
         SoldesRepository soldesRepository,
         IDialogService dialogService)
     {
-        Annee = configRepository.Charger().AnneeCourante;
-        var validations = validationsRepository.Charger(Annee);
+        _postesRepository = postesRepository;
+        _achatsRepository = achatsRepository;
+        _soldesRepository = soldesRepository;
+        _validationsRepository = validationsRepository;
+        _dialogService = dialogService;
+
+        _annee = configRepository.Charger().AnneeCourante;
+
+        ConstruireOngletsMois();
+
+        var adminViewModel = new AdminViewModel(Annee, configRepository, postesRepository, dialogService);
+        adminViewModel.AnneeEnregistree += ChangerAnnee;
+
+        OngletsAutres.Add(new BudgetViewModel(Annee, postesRepository, achatsRepository));
+        OngletsAutres.Add(new ImportViewModel());
+        OngletsAutres.Add(adminViewModel);
+
+        SelectionnerOngletCommand = new RelayCommand<TabViewModelBase>(onglet =>
+        {
+            if (onglet is not null)
+            {
+                OngletSelectionne = onglet;
+            }
+        });
+
+        _ongletSelectionne = ChoisirOngletParDefaut();
+        _ongletSelectionne.EstSelectionne = true;
+    }
+
+    private void ConstruireOngletsMois()
+    {
+        OngletsMois.Clear();
+        var validations = _validationsRepository.Charger(Annee);
 
         for (var mois = 0; mois < 12; mois++)
         {
             var cleMois = SoldesService.CleMois(Annee, mois);
             OngletsMois.Add(new MoisViewModel(
                 mois, Annee, estValide: validations.ContainsKey(cleMois),
-                postesRepository, achatsRepository, soldesRepository, validationsRepository, dialogService));
+                _postesRepository, _achatsRepository, _soldesRepository, _validationsRepository, _dialogService));
+        }
+    }
+
+    /// <summary>Le mois courant si l'année affichée est bien l'année civile en cours,
+    /// sinon janvier — utilisé au lancement et après un changement d'année.</summary>
+    private TabViewModelBase ChoisirOngletParDefaut()
+    {
+        var aujourdhui = DateTime.Now;
+        return aujourdhui.Year == Annee ? OngletsMois[aujourdhui.Month - 1] : OngletsMois[0];
+    }
+
+    private void ChangerAnnee(int nouvelleAnnee)
+    {
+        Annee = nouvelleAnnee;
+        ConstruireOngletsMois();
+
+        var indexBudget = OngletsAutres.ToList().FindIndex(o => o is BudgetViewModel);
+        if (indexBudget >= 0)
+        {
+            OngletsAutres[indexBudget] = new BudgetViewModel(Annee, _postesRepository, _achatsRepository);
         }
 
-        OngletsAutres.Add(new BudgetViewModel(Annee, postesRepository, achatsRepository));
-        OngletsAutres.Add(new ImportViewModel());
-        OngletsAutres.Add(new AdminViewModel());
-
-        // Sélectionne le mois courant au lancement (si l'année affichée est bien
-        // l'année civile en cours) ; sinon janvier par défaut.
-        var aujourdhui = DateTime.Now;
-        _ongletSelectionne = aujourdhui.Year == Annee ? OngletsMois[aujourdhui.Month - 1] : OngletsMois[0];
+        OngletSelectionne = ChoisirOngletParDefaut();
     }
 }

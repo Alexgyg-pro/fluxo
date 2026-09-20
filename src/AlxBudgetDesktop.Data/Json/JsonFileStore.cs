@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using AlxBudgetDesktop.Data.Json.Converters;
 
@@ -20,6 +21,11 @@ public sealed class JsonFileStore
     private static JsonSerializerOptions CreerOptions(bool indente) => new()
     {
         WriteIndented = indente,
+        // Par défaut, System.Text.Json échappe tout caractère non-ASCII (é pour
+        // "é"...), ce qui rend les fichiers illisibles et rompt la compatibilité
+        // "copier-coller" avec les fichiers JSON d'alxBudget (UTF-8 littéral). On
+        // n'échappe que le strict nécessaire pour rester un JSON valide/sûr.
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         Converters =
         {
             new DateOnlyJsonConverter(),

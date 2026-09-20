@@ -184,10 +184,14 @@ public sealed class MoisViewModel : TabViewModelBase
         ValiderCommand = new RelayCommand(Valider, () => PeutValider);
         DevaliderCommand = new RelayCommand(Devalider, () => EstValide);
 
-        Charger();
+        Rafraichir();
     }
 
-    private void Charger()
+    /// <summary>Recharge tout (postes, achats, soldes, validations) — appelé à la
+    /// construction et à chaque fois que l'onglet redevient actif (MainWindowViewModel),
+    /// pour refléter les changements faits depuis un autre onglet (ex. édition des
+    /// postes en Admin) sans relancer l'application.</summary>
+    public void Rafraichir()
     {
         _groupes = _postesRepository.Charger();
 
@@ -271,7 +275,7 @@ public sealed class MoisViewModel : TabViewModelBase
         var vm = new AchatModalViewModel(mode, _groupes, _achatsRepository, DateParDefaut());
         if (_dialogService.ShowAchatModal(vm))
         {
-            Charger();
+            Rafraichir();
         }
     }
 
@@ -286,7 +290,7 @@ public sealed class MoisViewModel : TabViewModelBase
         var vm = new AchatModalViewModel(mode, _groupes, _achatsRepository, DateParDefaut(), ligne.Achat);
         if (_dialogService.ShowAchatModal(vm))
         {
-            Charger();
+            Rafraichir();
         }
     }
 
@@ -300,7 +304,7 @@ public sealed class MoisViewModel : TabViewModelBase
         var vm = new CalageModalViewModel(Annee, SoldesService.CleMois(Annee, Mois), report, calageExistant, _soldesRepository);
         if (_dialogService.ShowCalageModal(vm))
         {
-            Charger();
+            Rafraichir();
         }
     }
 
@@ -315,7 +319,7 @@ public sealed class MoisViewModel : TabViewModelBase
         if (_dialogService.ShowConfirmDelete(vm))
         {
             _achatsRepository.Supprimer(Annee, ligne.Id);
-            Charger();
+            Rafraichir();
         }
     }
 
@@ -410,7 +414,7 @@ public sealed class MoisViewModel : TabViewModelBase
         var vm = new AchatModalViewModel(ModeAchat.Depense, _groupes, _achatsRepository, DateParDefaut(), prefill: prefill);
         if (_dialogService.ShowAchatModal(vm))
         {
-            Charger();
+            Rafraichir();
         }
     }
 

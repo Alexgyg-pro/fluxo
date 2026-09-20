@@ -37,13 +37,15 @@
 **En tant qu'**utilisateur, **je veux** qu'un seul onglet apparaisse sélectionné à la fois dans la barre du shell
 **afin de** ne pas être dérouté par un état visuel ambigu (un mois et une commande Budget/Import/Admin semblant sélectionnés simultanément).
 
-**Contexte :** La barre d'onglets est composée de deux `ListBox` distinctes (mois à gauche, Budget/Import/Admin à droite) qui partagent la même propriété liée `OngletSelectionne` (`MainWindowViewModel`). Un premier correctif (`FocusVisualStyle=Null` sur les styles d'item, pour écarter le rectangle de focus clavier par défaut de WPF) n'a pas résolu le problème — la double sélection persiste à l'usage.
+**Contexte :** Cause racine identifiée grâce à un scénario de repro détaillé du PO (Budget → clic sur un mois sans effet → il fallait cliquer un *autre* mois d'abord). Deux `ListBox` liées en `TwoWay` à la même propriété `OngletSelectionne` : quand la valeur passe à un objet absent de la propre `ItemsSource` d'une des deux listes, WPF ne vide PAS sa sélection interne (contrairement à l'hypothèse initiale) — elle garde l'ancien item "collé", ce qui bloque aussi les clics suivants sur ce même item tant qu'une sélection *différente* n'a pas été faite dans cette liste.
 
-**Décision PO :** reporté. La cause exacte n'est pas confirmée et le bon correctif dépend probablement de l'architecture qui sera retenue pour les écrans réels à venir (ex. le vrai contenu de l'onglet Mois pourrait changer la façon dont le focus/la sélection circule dans la fenêtre). À reprendre une fois qu'au moins un écran réel (pas un squelette) sera en place, avec du vrai contenu interactif à l'intérieur des onglets.
+**Correctif appliqué :** abandon complet du mécanisme `ListBox`/`Selector` pour la barre d'onglets. Remplacé par `ItemsControl` + `Button`, sélection pilotée explicitement par `MainWindowViewModel` (`TabViewModelBase.EstSelectionne`, mis à jour sur l'ancien ET le nouvel onglet à chaque changement, via `SelectionnerOngletCommand`).
 
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Cause racine identifiée (focus WPF, synchronisation `SelectedItem` entre les deux `ListBox`, ou autre).
-- [ ] Un seul onglet visuellement en surbrillance à la fois, quel que soit l'ordre des clics entre le groupe mois et le groupe Budget/Import/Admin.
+**Décision PO :** en attente de validation à l'usage avant de passer en Terminé.
+
+**Conditions de réussite :**
+- [x] Cause racine identifiée.
+- [ ] Un seul onglet visuellement en surbrillance à la fois, quel que soit l'ordre des clics entre le groupe mois et le groupe Budget/Import/Admin — à confirmer par le PO.
 - [ ] Validation visuelle par le PO.
 
 ---

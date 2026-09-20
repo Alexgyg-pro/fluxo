@@ -17,4 +17,7 @@ public interface IDialogService
 
     /// <summary>true si un calage a été enregistré ou supprimé (dans les deux cas, l'appelant doit rafraîchir).</summary>
     bool ShowCalageModal(CalageModalViewModel viewModel);
+
+    /// <summary>Modale de confirmation générique (succès/échec), fermée par OK.</summary>
+    void ShowConfirmation(ConfirmationModalViewModel viewModel);
 }

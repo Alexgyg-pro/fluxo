@@ -25,40 +25,42 @@
                        VerticalAlignment="Center" Foreground="{StaticResource BrosseAtténuee}" />
         </Grid>
 
-        <!-- Barre d'onglets custom : pas de TabControl natif, pour rester fidèle au
-             shell "onglets maison" côté React (App.tsx). Deux groupes distincts
-             partageant la même sélection : les mois à gauche (rendu façon "vrais
-             onglets", cf. StyleOngletMoisItem), Budget/Import/Admin à droite
-             (inchangés, simple ligne basse commune) — DockPanel pousse chaque
-             groupe vers son bord. -->
+        <!-- Barre d'onglets custom : pas de TabControl natif ni de ListBox/Selector
+             (cf. Styles.xaml pour l'explication — un Selector lié en TwoWay à une
+             valeur absente de sa propre liste ne se désélectionne pas tout seul).
+             Deux groupes d'ItemsControl+Button partageant la même commande de
+             sélection : les mois à gauche (rendu façon "vrais onglets", cf.
+             StyleOngletMoisBouton), Budget/Import/Admin à droite — DockPanel pousse
+             chaque groupe vers son bord. -->
         <DockPanel Grid.Row="1" Margin="24,0,24,0" LastChildFill="False">
-            <ListBox DockPanel.Dock="Left"
-                     Style="{StaticResource StyleBarreOnglets}"
-                     ItemContainerStyle="{StaticResource StyleOngletMoisItem}"
-                     ItemsSource="{Binding OngletsMois}"
-                     SelectedItem="{Binding OngletSelectionne, Mode=TwoWay}">
-                <ListBox.ItemTemplate>
+            <ItemsControl DockPanel.Dock="Left"
+                          Style="{StaticResource StyleBarreOnglets}"
+                          ItemsSource="{Binding OngletsMois}">
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Titre}" />
-                            <TextBlock Text=" ✓" Foreground="{StaticResource BrosseSucces}" FontWeight="Bold"
-                                       Visibility="{Binding EstValide, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
-                        </StackPanel>
+                        <Button Style="{StaticResource StyleOngletMoisBouton}"
+                                Command="{Binding DataContext.SelectionnerOngletCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Titre}" />
+                                <TextBlock Text=" ✓" Foreground="{StaticResource BrosseSucces}" FontWeight="Bold"
+                                           Visibility="{Binding EstValide, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
+                            </StackPanel>
+                        </Button>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
             <Border DockPanel.Dock="Right" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BrosseBordure}">
-                <ListBox Style="{StaticResource StyleBarreOnglets}"
-                         ItemContainerStyle="{StaticResource StyleOngletItem}"
-                         ItemsSource="{Binding OngletsAutres}"
-                         SelectedItem="{Binding OngletSelectionne, Mode=TwoWay}">
-                    <ListBox.ItemTemplate>
+                <ItemsControl Style="{StaticResource StyleBarreOnglets}" ItemsSource="{Binding OngletsAutres}">
+                    <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Titre}" />
+                            <Button Style="{StaticResource StyleOngletBouton}" Content="{Binding Titre}"
+                                    Command="{Binding DataContext.SelectionnerOngletCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}" />
                         </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </Border>
         </DockPanel>
 

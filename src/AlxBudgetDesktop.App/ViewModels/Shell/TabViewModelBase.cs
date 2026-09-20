@@ -19,4 +19,16 @@ public abstract class TabViewModelBase(string titre, bool estValide = false) : O
         get => _estValide;
         protected set => SetProperty(ref _estValide, value);
     }
+
+    private bool _estSelectionne;
+
+    /// <summary>Piloté explicitement par MainWindowViewModel (jamais par un contrôle
+    /// WPF de type Selector/ListBox) : une seule affectation, sur l'ancien ET le nouvel
+    /// onglet, garantit qu'un seul onglet est visuellement sélectionné à la fois — cf.
+    /// BACKLOG US-001 sur le bug de double sélection que ce mécanisme remplace.</summary>
+    public bool EstSelectionne
+    {
+        get => _estSelectionne;
+        set => SetProperty(ref _estSelectionne, value);
+    }
 }
