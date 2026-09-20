@@ -3,7 +3,6 @@ using System.Linq;
 using AlxBudgetDesktop.App.Mvvm;
 using AlxBudgetDesktop.App.ViewModels.Admin;
 using AlxBudgetDesktop.App.ViewModels.Budget;
-using AlxBudgetDesktop.App.ViewModels.Import;
 using AlxBudgetDesktop.App.ViewModels.Mois;
 using AlxBudgetDesktop.Data.Repositories;
 using AlxBudgetDesktop.Domain.Services;
@@ -95,7 +94,9 @@ public sealed class MainWindowViewModel : ObservableObject
         adminViewModel.AnneeEnregistree += ChangerAnnee;
 
         OngletsAutres.Add(new BudgetViewModel(Annee, postesRepository, achatsRepository));
-        OngletsAutres.Add(new ImportViewModel());
+        // Import volontairement masqué (BACKLOG US-003) : en pause faute d'export CSV
+        // bancaire testable, et le contrôle de rapprochement du mois couvre déjà une
+        // bonne partie du besoin. ImportViewModel reste en place, prêt à être réactivé.
         OngletsAutres.Add(adminViewModel);
 
         SelectionnerOngletCommand = new RelayCommand<TabViewModelBase>(onglet =>
