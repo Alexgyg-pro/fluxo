@@ -20,22 +20,25 @@
 - [ ] Le contrôle de rapprochement testé dessus donne des résultats cohérents (matches, orphelines, à saisir) validés manuellement par le PO.
 - [ ] Si l'export CSV n'est plus disponible : décision PO consignée sur l'alternative retenue.
 
+---
+
+## Terminé
+
 ### US-002 — Chaînage du solde d'ouverture entre années
 **En tant qu'**utilisateur, **je veux** que le solde d'ouverture de janvier reprenne la clôture de décembre de l'année précédente (quand elle existe)
 **afin de** avoir des soldes corrects dès la première consultation d'une nouvelle année, sans devoir caler manuellement chaque janvier.
 
-**Contexte :** `MoisViewModel.Charger()` appelle `SoldesService.CalculerSoldesAnnee(Annee, achatsAnnee, calages, groupes)` sans préciser `ouvertureJanvier`, qui vaut donc toujours zéro (défaut du service de domaine). Côté alxBudget (référence), ce chaînage inter-années est calculé par la couche route (`routes/soldes.ts::ouvertureJanvierDe`), récursivement, avec un plancher à l'année 2000 — cette couche n'a pas encore d'équivalent ici.
+**Décisions PO (livrées) :**
+- Demandé par anticipation par le PO, avant même d'avoir une deuxième année de données réelles, pour ne pas avoir à y repenser en fin d'année.
+- `SoldesAnneeService` (nouveau, côté `Data`) orchestre `AchatsRepository`/`PostesRepository`/`SoldesRepository` pour remonter récursivement l'ouverture de janvier sur la clôture de décembre de l'année précédente, tant qu'une année antérieure a des données (achats ou calage), avec un plancher à l'année 2000 — port fidèle de `routes/soldes.ts::ouvertureJanvierDe` côté alxBudget. `SoldesService` (Domain) reste pur, inchangé.
+- Nouveau projet `AlxBudgetDesktop.Data.Tests` (5 tests, dossiers temporaires isolés) : sans année précédente, chaînage sur une année, chaînage récursif sur plusieurs années, propagation d'un calage manuel, comportement au plancher 2000.
 
-**Décision PO :** reporté à la session qui développera le calage manuel des soldes (`CalageModalWindow`, cf. plan des écrans) — les deux sujets touchent la même zone (persistance et calcul des soldes) et gagnent à être traités ensemble.
+**Conditions de réussite :**
+- [x] Une fonction équivalente à `ouvertureJanvierDe` (remontée récursive, plancher 2000) ajoutée côté `Data`.
+- [x] `MoisViewModel` l'utilise pour calculer l'ouverture de janvier.
+- [x] Vérifié avec au moins deux années de données synthétiques successives (tests automatisés).
 
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Une fonction équivalente à `ouvertureJanvierDe` (remontée récursive tant qu'une année précédente a des données, plancher 2000) est ajoutée côté `Data` ou `App`.
-- [ ] `MoisViewModel` (ou son successeur) l'utilise pour calculer l'ouverture de janvier.
-- [ ] Vérifié avec au moins deux années de données synthétiques successives.
-
----
-
-## Terminé
+**Livré le :** 2026-09-20.
 
 ### US-001 — Double sélection visuelle dans la barre d'onglets
 **En tant qu'**utilisateur, **je veux** qu'un seul onglet apparaisse sélectionné à la fois dans la barre du shell
