@@ -1,0 +1,15 @@
+# Build .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Publication
+publish/
+
+# AIPLAN.md — jamais commité sur aucun projet
+AIPLAN.md
+
+# Garde-fou : un vrai dossier "data" ne doit jamais être versionné ici
+# (les données synthétiques de test vivent dans sample-data/, jamais dans data/)
+/data/
