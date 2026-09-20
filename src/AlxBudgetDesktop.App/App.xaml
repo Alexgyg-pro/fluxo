@@ -1,0 +1,41 @@
+<Application x:Class="AlxBudgetDesktop.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vmMois="clr-namespace:AlxBudgetDesktop.App.ViewModels.Mois"
+             xmlns:vmBudget="clr-namespace:AlxBudgetDesktop.App.ViewModels.Budget"
+             xmlns:vmImport="clr-namespace:AlxBudgetDesktop.App.ViewModels.Import"
+             xmlns:vmAdmin="clr-namespace:AlxBudgetDesktop.App.ViewModels.Admin"
+             xmlns:vMois="clr-namespace:AlxBudgetDesktop.App.Views.Mois"
+             xmlns:vBudget="clr-namespace:AlxBudgetDesktop.App.Views.Budget"
+             xmlns:vImport="clr-namespace:AlxBudgetDesktop.App.Views.Import"
+             xmlns:vAdmin="clr-namespace:AlxBudgetDesktop.App.Views.Admin"
+             xmlns:conv="clr-namespace:AlxBudgetDesktop.App.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <conv:BoolToVisibilityConverter x:Key="ConvertisseurBoolVersVisibilite" />
+            <conv:InverseBoolToVisibilityConverter x:Key="ConvertisseurBoolVersVisibiliteInverse" />
+            <conv:MontantOuTiretConverter x:Key="ConvertisseurMontantOuTiret" />
+            <conv:DateOnlyToDateTimeConverter x:Key="ConvertisseurDateOnlyVersDateTime" />
+            <!-- Routage des onglets : le ContentControl du shell affiche l'onglet
+                 sélectionné, WPF choisit automatiquement le DataTemplate en fonction
+                 du type concret du ViewModel — pas de routeur explicite. -->
+            <DataTemplate DataType="{x:Type vmMois:MoisViewModel}">
+                <vMois:MoisView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vmBudget:BudgetViewModel}">
+                <vBudget:BudgetView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vmImport:ImportViewModel}">
+                <vImport:ImportView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vmAdmin:AdminViewModel}">
+                <vAdmin:AdminView />
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
