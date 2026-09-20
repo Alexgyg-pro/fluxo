@@ -14,10 +14,13 @@ AIPLAN.md
 # (les données synthétiques de test vivent dans sample-data/, jamais dans data/)
 /data/
 
-# sample-data/ : seul postes.json est une vraie donnée d'exemple à versionner
-# (jeu de postes de départ). Le reste est de l'état généré/modifié à l'usage
-# au fil des tests dans l'appli, pas du contenu à figer dans l'historique.
+# sample-data/ : tout est de l'état généré/modifié à l'usage (y compris
+# postes.json depuis que l'onglet Admin peut l'éditer en direct — le suivre
+# revenait à capturer les essais faits dans l'appli à chaque commit). La copie
+# initiale des postes réels d'alxBudget reste consultable dans l'historique
+# git (commit "feat: dossier sample-data persistant + postes copies depuis alxBudget").
 /sample-data/config.json
+/sample-data/postes.json
 /sample-data/achats-*.jsonl
 /sample-data/soldes-*.json
 /sample-data/validations-*.json
