@@ -33,23 +33,21 @@
 - [ ] `MoisViewModel` (ou son successeur) l'utilise pour calculer l'ouverture de janvier.
 - [ ] Vérifié avec au moins deux années de données synthétiques successives.
 
-### US-001 — Double sélection visuelle dans la barre d'onglets
-**En tant qu'**utilisateur, **je veux** qu'un seul onglet apparaisse sélectionné à la fois dans la barre du shell
-**afin de** ne pas être dérouté par un état visuel ambigu (un mois et une commande Budget/Import/Admin semblant sélectionnés simultanément).
-
-**Contexte :** Cause racine identifiée grâce à un scénario de repro détaillé du PO (Budget → clic sur un mois sans effet → il fallait cliquer un *autre* mois d'abord). Deux `ListBox` liées en `TwoWay` à la même propriété `OngletSelectionne` : quand la valeur passe à un objet absent de la propre `ItemsSource` d'une des deux listes, WPF ne vide PAS sa sélection interne (contrairement à l'hypothèse initiale) — elle garde l'ancien item "collé", ce qui bloque aussi les clics suivants sur ce même item tant qu'une sélection *différente* n'a pas été faite dans cette liste.
-
-**Correctif appliqué :** abandon complet du mécanisme `ListBox`/`Selector` pour la barre d'onglets. Remplacé par `ItemsControl` + `Button`, sélection pilotée explicitement par `MainWindowViewModel` (`TabViewModelBase.EstSelectionne`, mis à jour sur l'ancien ET le nouvel onglet à chaque changement, via `SelectionnerOngletCommand`).
-
-**Décision PO :** en attente de validation à l'usage avant de passer en Terminé.
-
-**Conditions de réussite :**
-- [x] Cause racine identifiée.
-- [ ] Un seul onglet visuellement en surbrillance à la fois, quel que soit l'ordre des clics entre le groupe mois et le groupe Budget/Import/Admin — à confirmer par le PO.
-- [ ] Validation visuelle par le PO.
-
 ---
 
 ## Terminé
 
-*(vide pour l'instant — le socle technique initial est suivi dans AIPLAN.md, pas ici.)*
+### US-001 — Double sélection visuelle dans la barre d'onglets
+**En tant qu'**utilisateur, **je veux** qu'un seul onglet apparaisse sélectionné à la fois dans la barre du shell
+**afin de** ne pas être dérouté par un état visuel ambigu (un mois et une commande Budget/Import/Admin semblant sélectionnés simultanément).
+
+**Décisions PO (livrées) :**
+- Cause racine identifiée grâce à un scénario de repro détaillé du PO (Budget → clic sur un mois sans effet → il fallait cliquer un *autre* mois d'abord). Deux `ListBox` liées en `TwoWay` à la même propriété `OngletSelectionne` : quand la valeur passe à un objet absent de la propre `ItemsSource` d'une des deux listes, WPF ne vide PAS sa sélection interne — elle garde l'ancien item "collé", ce qui bloquait aussi les clics suivants sur ce même item.
+- Correctif : abandon complet du mécanisme `ListBox`/`Selector` pour la barre d'onglets, remplacé par `ItemsControl` + `Button`, sélection pilotée explicitement par `MainWindowViewModel` (`TabViewModelBase.EstSelectionne`, mis à jour sur l'ancien ET le nouvel onglet à chaque changement, via `SelectionnerOngletCommand`).
+
+**Conditions de réussite :**
+- [x] Cause racine identifiée.
+- [x] Un seul onglet visuellement en surbrillance à la fois, quel que soit l'ordre des clics entre le groupe mois et le groupe Budget/Import/Admin.
+- [x] Validation visuelle par le PO.
+
+**Livré le :** 2026-09-20 — validé à l'usage par le PO.
