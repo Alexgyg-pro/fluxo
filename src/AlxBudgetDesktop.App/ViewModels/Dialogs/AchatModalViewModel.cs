@@ -23,6 +23,7 @@ public sealed class AchatModalViewModel : ModalViewModelBase
     private readonly IReadOnlyList<GroupePostes> _groupes;
     private readonly AchatsRepository _achatsRepository;
     private readonly Achat? _achatExistant;
+    private readonly string? _libelleRelevePrefill;
 
     public ModeAchat Mode { get; }
     public bool EstEdition => _achatExistant is not null;
@@ -130,12 +131,14 @@ public sealed class AchatModalViewModel : ModalViewModelBase
         IReadOnlyList<GroupePostes> groupes,
         AchatsRepository achatsRepository,
         DateOnly dateParDefaut,
-        Achat? achatExistant = null)
+        Achat? achatExistant = null,
+        AchatPrefill? prefill = null)
     {
         Mode = mode;
         _groupes = groupes;
         _achatsRepository = achatsRepository;
         _achatExistant = achatExistant;
+        _libelleRelevePrefill = prefill?.LibelleReleve;
 
         var groupesPertinents = mode == ModeAchat.Recette
             ? groupes.Where(g => g.Nom == PostesSpeciaux.GroupeRevenus)
@@ -202,6 +205,15 @@ public sealed class AchatModalViewModel : ModalViewModelBase
         {
             _dateAchat = dateParDefaut;
             _compte = Compte.Courant;
+
+            if (prefill is not null)
+            {
+                _montantTexte = prefill.Montant.ToString("0.00", CultureInfo.InvariantCulture);
+                _etiquette = prefill.Etiquette;
+                _datePrelevementTexte = prefill.DatePrelevement.ToString("yyyy-MM-dd");
+                _raisonSociale = prefill.RaisonSociale;
+            }
+
             LignesPostes.Add(new LignePosteViewModel(groupes));
         }
     }
@@ -250,7 +262,7 @@ public sealed class AchatModalViewModel : ModalViewModelBase
             MontantAchat = MontantSaisi,
             Compte = Mode == ModeAchat.Recette ? Compte.Courant : Compte,
             Postes = postes,
-            LibelleReleve = _achatExistant?.LibelleReleve,
+            LibelleReleve = _achatExistant?.LibelleReleve ?? _libelleRelevePrefill,
         };
 
         var erreurs = AchatValidator.Valider(input);
