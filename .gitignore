@@ -14,6 +14,10 @@ AIPLAN.md
 # (les données synthétiques de test vivent dans sample-data/, jamais dans data/)
 /data/
 
+# Relevés bancaires réels utilisés pour développer/tester l'import (PDF, CSV,
+# xlsx) — données financières réelles, jamais versionnées.
+/tests/test_extraction/
+
 # sample-data/ : tout est de l'état généré/modifié à l'usage (y compris
 # postes.json depuis que l'onglet Admin peut l'éditer en direct — le suivre
 # revenait à capturer les essais faits dans l'appli à chaque commit). La copie
