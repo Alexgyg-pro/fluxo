@@ -7,23 +7,6 @@
 
 ## En cours
 
-### US-007 — Aide utilisateur accessible depuis l'application
-**En tant qu'**utilisateur, **je veux** accéder à une aide directement depuis l'application (icône « ? » à droite de l'onglet Admin dans la barre d'onglets)
-**afin de** ne pas devoir chercher et ouvrir `README.txt` séparément quand j'ai un doute sur le fonctionnement d'un écran.
-
-**Décisions PO (livrées) :**
-- Mode d'affichage : ouverture de `README.txt`/`README-utilisateur.txt` avec l'application par défaut du système (`Process.Start`), pas de fenêtre interne — plus simple, réutilise le mode d'emploi déjà existant tel quel.
-- `CheminAideResolver` (Data, `Paths/CheminAideResolver.cs`) résout le bon fichier selon le contexte : `README.txt` à côté de l'exécutable en publié, `README-utilisateur.txt` à la racine du dépôt en `dotnet run` (réutilise `DataPathProvider.TrouverRacineDepot`, rendue publique à cet effet).
-- Icône « ? » ronde (`StyleBoutonAide`) ajoutée à droite du groupe Budget/Admin dans `MainWindow.xaml`, distincte visuellement des onglets de navigation.
-- Modale d'erreur générique (`ConfirmationModalViewModel`) si le fichier d'aide est introuvable.
-
-**Conditions de réussite :**
-- [x] Décision PO sur le mode d'affichage.
-- [x] Icône « ? » visible à droite de l'onglet Admin, accessible en un clic depuis n'importe quel écran.
-- [ ] Testé par le PO dans l'appli (clic sur « ? » ouvre bien le mode d'emploi).
-
----
-
 ### US-006 — Ouvrir le sélecteur de fichier sur le dossier des relevés
 **En tant qu'**utilisateur, **je veux** que le sélecteur de fichier de « Contrôler avec un relevé » s'ouvre directement sur le dossier où atterrissent mes xlsx extraits
 **afin de** ne pas avoir à naviguer manuellement jusqu'au bon dossier à chaque import mensuel.
@@ -60,6 +43,23 @@
 ---
 
 ## Terminé
+
+### US-007 — Aide utilisateur accessible depuis l'application
+**En tant qu'**utilisateur, **je veux** accéder à une aide directement depuis l'application (icône « ? » à droite de l'onglet Admin dans la barre d'onglets)
+**afin de** ne pas devoir chercher et ouvrir `README.txt` séparément quand j'ai un doute sur le fonctionnement d'un écran.
+
+**Décisions PO (livrées) :**
+- Mode d'affichage : ouverture de `README.txt`/`README-utilisateur.txt` avec l'application par défaut du système (`Process.Start`), pas de fenêtre interne — plus simple, réutilise le mode d'emploi déjà existant tel quel.
+- `CheminAideResolver` (Data, `Paths/CheminAideResolver.cs`) résout le bon fichier selon le contexte : `README.txt` à côté de l'exécutable en publié, `README-utilisateur.txt` à la racine du dépôt en `dotnet run` (réutilise `DataPathProvider.TrouverRacineDepot`, rendue publique à cet effet).
+- Icône « ? » ronde (`StyleBoutonAide`) ajoutée à droite du groupe Budget/Admin dans `MainWindow.xaml`, distincte visuellement des onglets de navigation.
+- Modale d'erreur générique (`ConfirmationModalViewModel`) si le fichier d'aide est introuvable.
+
+**Conditions de réussite :**
+- [x] Décision PO sur le mode d'affichage.
+- [x] Icône « ? » visible à droite de l'onglet Admin, accessible en un clic depuis n'importe quel écran.
+- [x] Testé par le PO dans l'appli : clic sur « ? » ouvre bien le mode d'emploi.
+
+**Livré le :** 2026-09-25.
 
 ### US-005 — Importer un relevé bancaire via extraction Claude (PDF → xlsx)
 **En tant qu'**utilisateur, **je veux** importer mensuellement un relevé bancaire xlsx généré par Claude à partir du PDF CIC (export CSV bancaire indisponible, voir US-003)
