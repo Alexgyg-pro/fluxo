@@ -7,6 +7,20 @@
 
 ## En cours
 
+### US-006 — Ouvrir le sélecteur de fichier sur le dossier des relevés
+**En tant qu'**utilisateur, **je veux** que le sélecteur de fichier de « Contrôler avec un relevé » s'ouvre directement sur le dossier où atterrissent mes xlsx extraits
+**afin de** ne pas avoir à naviguer manuellement jusqu'au bon dossier à chaque import mensuel.
+
+**Contexte :** Remarque du PO pendant le test de US-005. Petite amélioration de confort, pas bloquante — à faire quand l'occasion se présente.
+
+**Piste à trancher à la reprise :** quel dossier par défaut (`InitialDirectory` du `OpenFileDialog` dans `MoisViewModel.Controler()`) — le dossier Téléchargements de l'utilisateur (`Environment.SpecialFolder.UserProfile` + `Downloads`, en tenant compte de la redirection OneDrive déjà observée sur cette machine), ou un dossier dédié à configurer ? Mémoriser aussi le dernier dossier utilisé serait plus robuste qu'un chemin figé.
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Décision PO sur le dossier par défaut (ou mémorisation du dernier dossier utilisé).
+- [ ] Le sélecteur s'ouvre sur ce dossier au lieu du dossier par défaut de Windows.
+
+---
+
 ### US-004 — Créer un installateur
 **En tant qu'**utilisateur, **je veux** un véritable installateur Windows (au lieu d'un dossier `publish/` à copier manuellement)
 **afin de** pouvoir installer l'application proprement moi-même, et surtout la partager avec quelqu'un d'autre de façon présentable, si l'occasion se présente.
@@ -28,22 +42,40 @@
 
 ---
 
+## Terminé
+
+### US-005 — Importer un relevé bancaire via extraction Claude (PDF → xlsx)
+**En tant qu'**utilisateur, **je veux** importer mensuellement un relevé bancaire xlsx généré par Claude à partir du PDF CIC (export CSV bancaire indisponible, voir US-003)
+**afin de** pouvoir alimenter le contrôle de rapprochement avec de vraies données, sans dépendre de l'export CSV du site CIC.
+
+**Décisions PO (livrées) :**
+- Le Livret DDS ne bouge que par virement vers/depuis le compte courant (pas de virement direct, intérêts négligeables) — déjà visible côté compte courant, donc seul cet onglet est lu. Pas de règle de mapping Épargne à construire : les virements s'étiquettent avec les postes Épargne (dépôt)/(retrait) comme n'importe quelle autre ligne importée.
+- Étend le contrôle éphémère existant ("Contrôler avec un relevé") plutôt que de construire l'écran Import persisté à 3 blocs prévu à l'origine dans PROMPT.md — hors besoin réel actuel.
+- `ReleveXlsxParser` (Domain, `Csv/ReleveXlsxParser.cs`) + `XlsxReleveFileReader` (Data, `Xlsx/XlsxReleveFileReader.cs`, ClosedXML) produisent la même forme `LigneReleve` que `CicCsvParser` — `ReconciliationService` et le contrôle éphémère n'ont pas changé.
+- Réutilisation de l'heuristique `ExtraireRaisonSociale` existante, extraite dans un helper partagé `LibelleReleveHeuristiques`. Affinée pour le xlsx : pour un paiement carte/retrait, la raison sociale vient de la colonne "Détail" (évite de dupliquer le nom de ville présent dans "Opération", défaut découvert en testant sur données réelles) ; pour un prélèvement/virement, elle vient de "Opération" comme avant.
+- Prompt Claude figé et versionné dans `docs/prompt-extraction-releve-cic.md`.
+- Bouton "Contrôler avec un relevé" (`MoisViewModel.Controler()`) accepte désormais `.csv` et `.xlsx`, aiguillé sur l'extension du fichier choisi.
+- US-003 remplacée par cette approche (décision PO) — voir plus bas.
+
+**Conditions de réussite :**
+- [x] Le prompt Claude utilisé pour produire l'extraction est figé/versionné (`docs/prompt-extraction-releve-cic.md`).
+- [x] Règle de mapping Épargne : pas nécessaire (voir décisions PO ci-dessus).
+- [x] Parseur xlsx écrit et testé (12 tests Domain + 2 tests Data + vérification manuelle sur le relevé réel du PO : 62 lignes brutes → 59 transactions, solde net -256,48€ conforme au PDF, aucune raison sociale vide).
+- [x] Test de bout en bout par le PO dans l'application (bouton "Contrôler avec un relevé" avec le vrai xlsx d'août 2026) : 7 orphelines, 10 lignes "à saisir" — cohérent avec la vérification manuelle en amont.
+- [x] Décision PO sur le sort de US-003 : remplacée par cette approche.
+
+**Livré le :** 2026-09-25.
+
 ### US-003 — Valider le contrôle de rapprochement en conditions réelles
-**En tant qu'**utilisateur, **je veux** tester le contrôle de rapprochement bancaire (bouton "Contrôler avec un relevé") avec un vrai export CSV de ma banque
+**En tant qu'**utilisateur, **je veux** tester le contrôle de rapprochement bancaire avec un vrai relevé de ma banque
 **afin de** m'assurer qu'il fonctionne correctement sur mes propres relevés, pas seulement sur des fixtures synthétiques.
 
-**Contexte :** Depuis plusieurs semaines, le PO n'arrive plus à télécharger l'export CSV depuis le site de sa banque (CIC) — le lien mentionné dans NOTICE.md d'alxBudget ("Opérations" → "Télécharger vos dernières opérations") ne fonctionne plus de son côté. Cette fonctionnalité n'a donc jamais pu être testée en conditions réelles, ni côté alxBudget (web) ni côté alxBudgetDesktop. Le code (parseur CSV CIC, algorithme de rapprochement, contrôle éphémère) a été porté fidèlement depuis alxBudget et testé unitairement (32 tests domaine) et avec un CSV synthétique, mais jamais validé sur un vrai relevé.
+**Décision PO (livrée) :** l'export CSV officiel du site CIC reste inaccessible, mais l'objectif de cette US (valider le rapprochement en conditions réelles) est atteint via US-005 (extraction PDF → xlsx par Claude). Remplacée par US-005, pas de suite à donner sur l'export CSV du site tant qu'il n'est pas redemandé explicitement.
 
-**Décision PO :** mis en pause, pas bloquant pour la suite du développement. À reprendre dès que l'export CSV redevient accessible. Si la banque a définitivement retiré cette fonctionnalité côté site, il faudra revoir l'approche (autre format d'export si disponible, ou abandon du rapprochement automatique au profit d'une vérification manuelle des opérations) — décision à prendre avec le PO à ce moment-là, pas avant.
+**Conditions de réussite :**
+- [x] Le contrôle de rapprochement a été testé sur un vrai relevé (via US-005) et donne des résultats cohérents, validés par le PO.
 
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Un export CSV réel de la banque a pu être obtenu.
-- [ ] Le contrôle de rapprochement testé dessus donne des résultats cohérents (matches, orphelines, à saisir) validés manuellement par le PO.
-- [ ] Si l'export CSV n'est plus disponible : décision PO consignée sur l'alternative retenue.
-
----
-
-## Terminé
+**Livré le :** 2026-09-25 (via US-005).
 
 ### US-002 — Chaînage du solde d'ouverture entre années
 **En tant qu'**utilisateur, **je veux** que le solde d'ouverture de janvier reprenne la clôture de décembre de l'année précédente (quand elle existe)
