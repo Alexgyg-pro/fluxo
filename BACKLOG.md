@@ -11,16 +11,16 @@
 **En tant qu'**utilisateur, **je veux** accéder à une aide directement depuis l'application (icône « ? » à droite de l'onglet Admin dans la barre d'onglets)
 **afin de** ne pas devoir chercher et ouvrir `README.txt` séparément quand j'ai un doute sur le fonctionnement d'un écran.
 
-**Contexte :** `README-utilisateur.txt` existe déjà (mode d'emploi complet en français, suivi par git, copié automatiquement dans `publish/README.txt` à chaque publication) mais reste un fichier externe à ouvrir soi-même — l'appli n'y renvoie pas.
+**Décisions PO (livrées) :**
+- Mode d'affichage : ouverture de `README.txt`/`README-utilisateur.txt` avec l'application par défaut du système (`Process.Start`), pas de fenêtre interne — plus simple, réutilise le mode d'emploi déjà existant tel quel.
+- `CheminAideResolver` (Data, `Paths/CheminAideResolver.cs`) résout le bon fichier selon le contexte : `README.txt` à côté de l'exécutable en publié, `README-utilisateur.txt` à la racine du dépôt en `dotnet run` (réutilise `DataPathProvider.TrouverRacineDepot`, rendue publique à cet effet).
+- Icône « ? » ronde (`StyleBoutonAide`) ajoutée à droite du groupe Budget/Admin dans `MainWindow.xaml`, distincte visuellement des onglets de navigation.
+- Modale d'erreur générique (`ConfirmationModalViewModel`) si le fichier d'aide est introuvable.
 
-**Pistes à trancher à la reprise :**
-- Emplacement : un bouton/icône « ? » ajouté à droite du groupe `OngletsAutres` (Budget/Admin) dans `MainWindow.xaml`, à côté de l'onglet Admin comme demandé par le PO.
-- Contenu affiché : réutiliser le texte de `README-utilisateur.txt` tel quel (affiché dans une fenêtre/modale dédiée), ou lancer le fichier avec l'application par défaut du système (`Process.Start`) — à trancher.
-- Si affichage interne : voir si un contenu structuré par écran (aide contextuelle) apporterait plus qu'un simple mode d'emploi linéaire, ou si c'est prématuré pour l'usage actuel (un seul utilisateur, déjà familier de l'appli).
-
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Décision PO sur le mode d'affichage (fenêtre interne vs ouverture du fichier).
-- [ ] Icône « ? » visible à droite de l'onglet Admin, accessible en un clic depuis n'importe quel écran.
+**Conditions de réussite :**
+- [x] Décision PO sur le mode d'affichage.
+- [x] Icône « ? » visible à droite de l'onglet Admin, accessible en un clic depuis n'importe quel écran.
+- [ ] Testé par le PO dans l'appli (clic sur « ? » ouvre bien le mode d'emploi).
 
 ---
 
