@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using Microsoft.Win32;
 using AlxBudgetDesktop.App.Mvvm;
 using AlxBudgetDesktop.App.ViewModels.Dialogs;
@@ -6,6 +7,7 @@ using AlxBudgetDesktop.App.ViewModels.Shell;
 using AlxBudgetDesktop.Data.Csv;
 using AlxBudgetDesktop.Data.Repositories;
 using AlxBudgetDesktop.Data.Services;
+using AlxBudgetDesktop.Data.Xlsx;
 using AlxBudgetDesktop.Domain.Csv;
 using AlxBudgetDesktop.Domain.Models;
 using AlxBudgetDesktop.Domain.Rapprochement;
@@ -328,8 +330,8 @@ public sealed class MoisViewModel : TabViewModelBase
     {
         var dialog = new OpenFileDialog
         {
-            Title = "Sélectionner un relevé bancaire (CSV CIC)",
-            Filter = "Fichiers CSV (*.csv)|*.csv|Tous les fichiers (*.*)|*.*",
+            Title = "Sélectionner un relevé bancaire (CSV CIC ou xlsx extrait via Claude)",
+            Filter = "Relevés bancaires (*.csv;*.xlsx)|*.csv;*.xlsx|Fichiers CSV (*.csv)|*.csv|Fichiers Excel (*.xlsx)|*.xlsx|Tous les fichiers (*.*)|*.*",
         };
 
         if (dialog.ShowDialog() != true)
@@ -339,8 +341,10 @@ public sealed class MoisViewModel : TabViewModelBase
 
         try
         {
-            var texte = CicCsvFileReader.LireTexte(dialog.FileName);
-            var lignes = CicCsvParser.Parse(texte);
+            var estXlsx = string.Equals(Path.GetExtension(dialog.FileName), ".xlsx", StringComparison.OrdinalIgnoreCase);
+            var lignes = estXlsx
+                ? ReleveXlsxParser.Parse(XlsxReleveFileReader.Lire(dialog.FileName))
+                : CicCsvParser.Parse(CicCsvFileReader.LireTexte(dialog.FileName));
             MessageErreurControle = null;
 
             var achatsAnnee = _achatsRepository.ListerAchats(Annee);

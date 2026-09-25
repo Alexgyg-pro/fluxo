@@ -68,7 +68,7 @@ public static class CicCsvParser
                 Index = index++,
                 DatePrelevement = datePrelevement.Value,
                 Montant = montant.Value,
-                RaisonSociale = ExtraireRaisonSociale(libelle),
+                RaisonSociale = LibelleReleveHeuristiques.ExtraireRaisonSociale(libelle),
                 LibelleBrut = libelle,
             });
         }
@@ -185,22 +185,4 @@ public static class CicCsvParser
     }
 
     private static string NettoyerLibelle(string s) => EspacesMultiples.Replace(s, " ").Trim();
-
-    private static readonly Regex SuffixeCarte = new(@"\sCARTE\s+\d.*$", RegexOptions.Compiled);
-    private static readonly Regex PrefixeOperation = new(
-        @"^(PAIEMENT\s+PSC|PAIEMENT\s+CB|PRLV\s+SEPA|VIR\s+SEPA|RETRAIT\s+DAB|PRLV|VIR)\s+",
-        RegexOptions.Compiled);
-    private static readonly Regex CodeDateResiduel = new(@"^\d{4}\s+", RegexOptions.Compiled);
-    private static readonly Regex ReferenceTransactionResiduelle = new(
-        @"\s*[A-Z]?\d{2}[A-Z]\d{3,}[A-Z]?\d*$", RegexOptions.Compiled);
-
-    private static string ExtraireRaisonSociale(string libelle)
-    {
-        var s = libelle.ToUpperInvariant();
-        s = SuffixeCarte.Replace(s, "");
-        s = PrefixeOperation.Replace(s, "");
-        s = CodeDateResiduel.Replace(s, "");
-        s = ReferenceTransactionResiduelle.Replace(s, "");
-        return EspacesMultiples.Replace(s, " ").Trim();
-    }
 }
