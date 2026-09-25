@@ -7,6 +7,20 @@
 
 ## En cours
 
+### US-006 — Ouvrir le sélecteur de fichier sur le dossier des relevés
+**En tant qu'**utilisateur, **je veux** que le sélecteur de fichier de « Contrôler avec un relevé » s'ouvre directement sur le dossier où atterrissent mes xlsx extraits
+**afin de** ne pas avoir à naviguer manuellement jusqu'au bon dossier à chaque import mensuel.
+
+**Contexte :** Remarque du PO pendant le test de US-005. Petite amélioration de confort, pas bloquante — à faire quand l'occasion se présente.
+
+**Piste à trancher à la reprise :** quel dossier par défaut (`InitialDirectory` du `OpenFileDialog` dans `MoisViewModel.Controler()`) — le dossier Téléchargements de l'utilisateur (`Environment.SpecialFolder.UserProfile` + `Downloads`, en tenant compte de la redirection OneDrive déjà observée sur cette machine), ou un dossier dédié à configurer ? Mémoriser aussi le dernier dossier utilisé serait plus robuste qu'un chemin figé.
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Décision PO sur le dossier par défaut (ou mémorisation du dernier dossier utilisé).
+- [ ] Le sélecteur s'ouvre sur ce dossier au lieu du dossier par défaut de Windows.
+
+---
+
 ### US-005 — Importer un relevé bancaire via extraction Claude (PDF → xlsx)
 **En tant qu'**utilisateur, **je veux** importer mensuellement un relevé bancaire xlsx généré par Claude à partir du PDF CIC (export CSV bancaire indisponible depuis plusieurs semaines, voir US-003)
 **afin de** pouvoir enfin alimenter le contrôle de rapprochement avec de vraies données, sans dépendre de l'export CSV du site CIC.
