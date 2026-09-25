@@ -11,19 +11,21 @@
 **En tant qu'**utilisateur, **je veux** importer mensuellement un relevé bancaire xlsx généré par Claude à partir du PDF CIC (export CSV bancaire indisponible depuis plusieurs semaines, voir US-003)
 **afin de** pouvoir enfin alimenter le contrôle de rapprochement avec de vraies données, sans dépendre de l'export CSV du site CIC.
 
-**Contexte :** Faute d'export CSV bancaire accessible, le PO a testé une extraction du PDF de relevé via Claude (claude.ai), qui produit un CSV et un xlsx. Analyse faite du fichier `tests/test_extraction/Releve_bancaire_CIC_2026-08.xlsx` (comparé ligne à ligne au PDF source) :
-- Extraction fidèle : soldes de clôture recalculés manuellement (compte courant 1228,44€, Livret DDS 2727,83€) identiques au PDF au centime près.
-- Structure xlsx : 3 onglets (`Résumé`, `Compte courant`, `Livret DDS`), colonnes `Date`, `Date valeur`, `Opération`, `Détail`, `Débit (EUR)`, `Crédit (EUR)` par onglet compte, avec une ligne de solde d'ouverture synthétisée, les transactions, puis une ligne `TOTAL DES MOUVEMENTS` et une ligne de solde de clôture (ces deux dernières en formules Excel).
-- Bonne surprise : les dates sont stockées en texte ISO brut (`"AAAA-MM-JJ"`), déjà dans le format interne de l'appli — pas de conversion de locale à prévoir.
-- Piège identifié : ne pas se fier aux cellules formules (`TOTAL DES MOUVEMENTS`, clôture) pour un futur parseur — elles peuvent revenir vides si le fichier n'a jamais été réouvert/recalculé par Excel. L'appli recalcule déjà soldes et totaux elle-même à partir des lignes de transaction ; le parseur doit ignorer ces lignes de synthèse plutôt que les lire.
-- PO préfère travailler en xlsx plutôt qu'en CSV : plus lisible, et il compte faire des opérations manuelles sur le fichier (catégorisation ?) avant import.
+**Contexte :** Faute d'export CSV bancaire accessible, le PO a testé une extraction du PDF de relevé via Claude (claude.ai), qui produit un CSV et un xlsx. Analyse faite du fichier `tests/test_extraction/Releve_bancaire_CIC_2026-08.xlsx` (comparé ligne à ligne au PDF source) : extraction fidèle (soldes de clôture identiques au PDF au centime près), structure propre (dates en texte ISO), 3 onglets (`Résumé`, `Compte courant`, `Livret DDS`).
 
-**Question ouverte, à traiter à part avant de coder le parseur (décision PO) :** comment les virements entre le compte courant et le Livret DDS (visibles séparément dans les deux onglets) doivent se mapper sur les postes spéciaux Épargne (dépôt)/Épargne (retrait) de l'application — ce n'est pas déductible automatiquement des deux onglets pris isolément, ça demande une règle explicite. Pas tranché, sujet parqué pour une session dédiée.
+**Décisions PO (livrées) :**
+- Le Livret DDS ne bouge que par virement vers/depuis le compte courant (pas de virement direct, intérêts négligeables) — déjà visible côté compte courant, donc seul cet onglet est lu. Pas de règle de mapping Épargne à construire : les virements s'étiquettent avec les postes Épargne (dépôt)/(retrait) comme n'importe quelle autre ligne importée.
+- Étend le contrôle éphémère existant ("Contrôler avec un relevé") plutôt que de construire l'écran Import persisté à 3 blocs prévu à l'origine dans PROMPT.md — hors besoin réel actuel.
+- `ReleveXlsxParser` (Domain, `Csv/ReleveXlsxParser.cs`) + `XlsxReleveFileReader` (Data, `Xlsx/XlsxReleveFileReader.cs`, ClosedXML) produisent la même forme `LigneReleve` que `CicCsvParser` — `ReconciliationService` et le contrôle éphémère n'ont pas changé.
+- Réutilisation de l'heuristique `ExtraireRaisonSociale` existante, extraite dans un helper partagé `LibelleReleveHeuristiques`. Affinée pour le xlsx : pour un paiement carte/retrait, la raison sociale vient de la colonne "Détail" (évite de dupliquer le nom de ville présent dans "Opération", défaut découvert en testant sur données réelles) ; pour un prélèvement/virement, elle vient de "Opération" comme avant.
+- Prompt Claude figé et versionné dans `docs/prompt-extraction-releve-cic.md`.
+- Bouton "Contrôler avec un relevé" (`MoisViewModel.Controler()`) accepte désormais `.csv` et `.xlsx`, aiguillé sur l'extension du fichier choisi.
 
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Le prompt Claude utilisé pour produire l'extraction est figé/versionné quelque part, pour garantir une structure stable d'un mois sur l'autre (sinon le parseur casse au premier écart).
-- [ ] Règle de mapping des virements Compte courant ↔ Livret DDS vers Épargne (dépôt/retrait) définie et validée par le PO.
-- [ ] Parseur xlsx écrit et testé sur au moins un relevé réel (le fichier `tests/test_extraction/Releve_bancaire_CIC_2026-08.xlsx` peut servir de fixture).
+**Conditions de réussite :**
+- [x] Le prompt Claude utilisé pour produire l'extraction est figé/versionné (`docs/prompt-extraction-releve-cic.md`).
+- [x] Règle de mapping Épargne : pas nécessaire (voir décisions PO ci-dessus).
+- [x] Parseur xlsx écrit et testé (12 tests Domain + 2 tests Data + vérification manuelle sur le relevé réel du PO : 62 lignes brutes → 59 transactions, solde net -256,48€ conforme au PDF, aucune raison sociale vide).
+- [ ] Test de bout en bout par le PO dans l'application (bouton "Contrôler avec un relevé" avec un vrai fichier xlsx) — à faire avant de trancher le sort de US-003.
 - [ ] Décision PO sur le sort de US-003 (remplacée par cette approche, ou conservée en parallèle si l'export CSV redevient un jour accessible).
 
 ---
