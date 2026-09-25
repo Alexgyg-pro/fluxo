@@ -7,6 +7,27 @@
 
 ## En cours
 
+### US-005 — Importer un relevé bancaire via extraction Claude (PDF → xlsx)
+**En tant qu'**utilisateur, **je veux** importer mensuellement un relevé bancaire xlsx généré par Claude à partir du PDF CIC (export CSV bancaire indisponible depuis plusieurs semaines, voir US-003)
+**afin de** pouvoir enfin alimenter le contrôle de rapprochement avec de vraies données, sans dépendre de l'export CSV du site CIC.
+
+**Contexte :** Faute d'export CSV bancaire accessible, le PO a testé une extraction du PDF de relevé via Claude (claude.ai), qui produit un CSV et un xlsx. Analyse faite du fichier `tests/test_extraction/Releve_bancaire_CIC_2026-08.xlsx` (comparé ligne à ligne au PDF source) :
+- Extraction fidèle : soldes de clôture recalculés manuellement (compte courant 1228,44€, Livret DDS 2727,83€) identiques au PDF au centime près.
+- Structure xlsx : 3 onglets (`Résumé`, `Compte courant`, `Livret DDS`), colonnes `Date`, `Date valeur`, `Opération`, `Détail`, `Débit (EUR)`, `Crédit (EUR)` par onglet compte, avec une ligne de solde d'ouverture synthétisée, les transactions, puis une ligne `TOTAL DES MOUVEMENTS` et une ligne de solde de clôture (ces deux dernières en formules Excel).
+- Bonne surprise : les dates sont stockées en texte ISO brut (`"AAAA-MM-JJ"`), déjà dans le format interne de l'appli — pas de conversion de locale à prévoir.
+- Piège identifié : ne pas se fier aux cellules formules (`TOTAL DES MOUVEMENTS`, clôture) pour un futur parseur — elles peuvent revenir vides si le fichier n'a jamais été réouvert/recalculé par Excel. L'appli recalcule déjà soldes et totaux elle-même à partir des lignes de transaction ; le parseur doit ignorer ces lignes de synthèse plutôt que les lire.
+- PO préfère travailler en xlsx plutôt qu'en CSV : plus lisible, et il compte faire des opérations manuelles sur le fichier (catégorisation ?) avant import.
+
+**Question ouverte, à traiter à part avant de coder le parseur (décision PO) :** comment les virements entre le compte courant et le Livret DDS (visibles séparément dans les deux onglets) doivent se mapper sur les postes spéciaux Épargne (dépôt)/Épargne (retrait) de l'application — ce n'est pas déductible automatiquement des deux onglets pris isolément, ça demande une règle explicite. Pas tranché, sujet parqué pour une session dédiée.
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Le prompt Claude utilisé pour produire l'extraction est figé/versionné quelque part, pour garantir une structure stable d'un mois sur l'autre (sinon le parseur casse au premier écart).
+- [ ] Règle de mapping des virements Compte courant ↔ Livret DDS vers Épargne (dépôt/retrait) définie et validée par le PO.
+- [ ] Parseur xlsx écrit et testé sur au moins un relevé réel (le fichier `tests/test_extraction/Releve_bancaire_CIC_2026-08.xlsx` peut servir de fixture).
+- [ ] Décision PO sur le sort de US-003 (remplacée par cette approche, ou conservée en parallèle si l'export CSV redevient un jour accessible).
+
+---
+
 ### US-004 — Créer un installateur
 **En tant qu'**utilisateur, **je veux** un véritable installateur Windows (au lieu d'un dossier `publish/` à copier manuellement)
 **afin de** pouvoir installer l'application proprement moi-même, et surtout la partager avec quelqu'un d'autre de façon présentable, si l'occasion se présente.
@@ -35,6 +56,8 @@
 **Contexte :** Depuis plusieurs semaines, le PO n'arrive plus à télécharger l'export CSV depuis le site de sa banque (CIC) — le lien mentionné dans NOTICE.md d'alxBudget ("Opérations" → "Télécharger vos dernières opérations") ne fonctionne plus de son côté. Cette fonctionnalité n'a donc jamais pu être testée en conditions réelles, ni côté alxBudget (web) ni côté alxBudgetDesktop. Le code (parseur CSV CIC, algorithme de rapprochement, contrôle éphémère) a été porté fidèlement depuis alxBudget et testé unitairement (32 tests domaine) et avec un CSV synthétique, mais jamais validé sur un vrai relevé.
 
 **Décision PO :** mis en pause, pas bloquant pour la suite du développement. À reprendre dès que l'export CSV redevient accessible. Si la banque a définitivement retiré cette fonctionnalité côté site, il faudra revoir l'approche (autre format d'export si disponible, ou abandon du rapprochement automatique au profit d'une vérification manuelle des opérations) — décision à prendre avec le PO à ce moment-là, pas avant.
+
+**Mise à jour :** piste alternative explorée et documentée dans US-005 (extraction PDF → xlsx via Claude) — le sort de cette US (remplacée ou conservée en parallèle) sera tranché à l'issue de US-005.
 
 **Conditions de réussite (à affiner à la reprise) :**
 - [ ] Un export CSV réel de la banque a pu être obtenu.
