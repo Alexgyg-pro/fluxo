@@ -52,6 +52,9 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <Button DockPanel.Dock="Right" Style="{StaticResource StyleBoutonAide}" Content="?"
+                    Margin="8,0,0,0" ToolTip="Aide" Command="{Binding OuvrirAideCommand}" />
+
             <Border DockPanel.Dock="Right" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BrosseBordure}">
                 <ItemsControl Style="{StaticResource StyleBarreOnglets}" ItemsSource="{Binding OngletsAutres}">
                     <ItemsControl.ItemTemplate>

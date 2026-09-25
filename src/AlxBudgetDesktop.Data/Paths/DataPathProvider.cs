@@ -44,8 +44,9 @@ public sealed class DataPathProvider
 
     /// <summary>Remonte l'arborescence depuis <paramref name="depart"/> à la recherche
     /// d'un fichier .sln, marqueur de la racine du dépôt. Renvoie null si aucun n'est
-    /// trouvé (cas d'un exécutable publié, exécuté hors du dépôt source).</summary>
-    private static string? TrouverRacineDepot(string depart)
+    /// trouvé (cas d'un exécutable publié, exécuté hors du dépôt source). Public pour
+    /// être réutilisé par CheminAideResolver (même détection dev/publié).</summary>
+    public static string? TrouverRacineDepot(string depart)
     {
         var dossier = new DirectoryInfo(depart);
         while (dossier is not null)
