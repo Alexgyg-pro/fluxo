@@ -1,3 +1,4 @@
+using AlxBudgetDesktop.App.ViewModels.Aide;
 using AlxBudgetDesktop.App.ViewModels.Dialogs;
 
 namespace AlxBudgetDesktop.App.Mvvm;
@@ -24,4 +25,8 @@ public interface IDialogService
     /// <summary>true si l'action a été confirmée. Contrairement à ShowConfirmDelete, aucun
     /// wording de suppression en dur — pour n'importe quelle action à confirmer.</summary>
     bool ShowConfirmAction(ConfirmActionModalViewModel viewModel);
+
+    /// <summary>Ouvre la fenêtre d'aide — non modale, contrairement aux autres méthodes
+    /// ci-dessus : on doit pouvoir la garder ouverte en consultant le reste de l'appli.</summary>
+    void ShowAide(AideViewModel viewModel);
 }

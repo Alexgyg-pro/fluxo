@@ -12,6 +12,12 @@
     <Resource Include="Resources\icone.ico" />
   </ItemGroup>
 
+  <!-- Contenu de l'aide en ligne, embarqué dans l'exécutable (pas de fichiers
+       à côté de l'exe à gérer) — voir AideViewModel.ChargerContenu. -->
+  <ItemGroup>
+    <Resource Include="Aide\*.md" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>

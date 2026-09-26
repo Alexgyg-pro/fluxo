@@ -1,5 +1,7 @@
 using System.Windows;
+using AlxBudgetDesktop.App.ViewModels.Aide;
 using AlxBudgetDesktop.App.ViewModels.Dialogs;
+using AlxBudgetDesktop.App.Views.Aide;
 using AlxBudgetDesktop.App.Views.Dialogs;
 
 namespace AlxBudgetDesktop.App.Mvvm;
@@ -20,6 +22,12 @@ public sealed class DialogService : IDialogService
 
     public bool ShowConfirmAction(ConfirmActionModalViewModel viewModel)
         => ShowModal(new ConfirmActionModalWindow { DataContext = viewModel }, viewModel);
+
+    public void ShowAide(AideViewModel viewModel)
+    {
+        var fenetre = new AideWindow { DataContext = viewModel, Owner = Application.Current.MainWindow };
+        fenetre.Show();
+    }
 
     private static bool ShowModal(Window fenetre, ModalViewModelBase viewModel)
     {
