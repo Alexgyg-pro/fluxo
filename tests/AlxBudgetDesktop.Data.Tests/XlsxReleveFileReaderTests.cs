@@ -28,13 +28,13 @@ public class XlsxReleveFileReaderTests
 
         compteCourant.Cell(3, 1).Value = "2026-08-05";
         compteCourant.Cell(3, 2).Value = "2026-08-05";
-        compteCourant.Cell(3, 3).Value = "PAIEMENT PSC 0508 TRAPPES";
-        compteCourant.Cell(3, 4).Value = "MARKET TRAPPES CARTE 5299";
+        compteCourant.Cell(3, 3).Value = "PAIEMENT PSC 0508 FICTIVILLE";
+        compteCourant.Cell(3, 4).Value = "SUPERETTE DEMO CARTE 5299";
         compteCourant.Cell(3, 5).Value = 12.50m;
 
         compteCourant.Cell(4, 1).Value = "2026-08-10";
         compteCourant.Cell(4, 2).Value = "2026-08-10";
-        compteCourant.Cell(4, 3).Value = "VIR EVERIENCE - HELPLINE";
+        compteCourant.Cell(4, 3).Value = "VIR EMPLOYEUR SARL";
         compteCourant.Cell(4, 4).Value = "SALAIRE";
         compteCourant.Cell(4, 6).Value = 987.50m;
 
@@ -67,8 +67,8 @@ public class XlsxReleveFileReaderTests
 
         Assert.Equal(5, lignes.Count);
         Assert.Equal("SOLDE CRÉDITEUR (ouverture)", lignes[0].Operation);
-        Assert.Equal("PAIEMENT PSC 0508 TRAPPES", lignes[1].Operation);
-        Assert.Equal("MARKET TRAPPES CARTE 5299", lignes[1].Detail);
+        Assert.Equal("PAIEMENT PSC 0508 FICTIVILLE", lignes[1].Operation);
+        Assert.Equal("SUPERETTE DEMO CARTE 5299", lignes[1].Detail);
         Assert.Equal(12.50m, lignes[1].Debit);
         Assert.Null(lignes[1].Credit);
         Assert.Equal(987.50m, lignes[2].Credit);

@@ -49,8 +49,8 @@ public sealed class AchatsRepositoryTests : IDisposable
             Index = 0,
             DatePrelevement = new DateOnly(2026, 8, 3),
             Montant = -30.01m,
-            RaisonSociale = "MARKET TRAPPES",
-            LibelleBrut = "PAIEMENT PSC 3107 TRAPPES MARKET TRAPPES CARTE 5299",
+            RaisonSociale = "SUPERETTE DEMO",
+            LibelleBrut = "PAIEMENT PSC 3107 FICTIVILLE SUPERETTE DEMO CARTE 5299",
         };
 
         _achatsRepository.AppliquerRapprochements(2026, [new RapprochementMatch { AchatId = achat.Id, Ligne = ligne }]);
@@ -58,7 +58,7 @@ public sealed class AchatsRepositoryTests : IDisposable
         var relu = _achatsRepository.ListerAchats(2026).Single(a => a.Id == achat.Id);
         Assert.True(relu.Rapproche);
         Assert.Equal(new DateOnly(2026, 8, 3), relu.DatePrelevement);
-        Assert.Equal("MARKET TRAPPES", relu.RaisonSociale);
+        Assert.Equal("SUPERETTE DEMO", relu.RaisonSociale);
         Assert.Equal(ligne.LibelleBrut, relu.LibelleReleve);
     }
 
@@ -80,7 +80,7 @@ public sealed class AchatsRepositoryTests : IDisposable
     public void ReinitialiserRapprochement_remet_rapproche_a_false_sans_perdre_l_achat()
     {
         var achat = _achatsRepository.Ajouter(Depense(30.01m, new DateOnly(2026, 7, 31)));
-        var ligne = new LigneReleve { Index = 0, DatePrelevement = new DateOnly(2026, 8, 3), Montant = -30.01m, RaisonSociale = "MARKET TRAPPES", LibelleBrut = "..." };
+        var ligne = new LigneReleve { Index = 0, DatePrelevement = new DateOnly(2026, 8, 3), Montant = -30.01m, RaisonSociale = "SUPERETTE DEMO", LibelleBrut = "..." };
         _achatsRepository.AppliquerRapprochements(2026, [new RapprochementMatch { AchatId = achat.Id, Ligne = ligne }]);
 
         _achatsRepository.ReinitialiserRapprochement(2026, [achat.Id]);
