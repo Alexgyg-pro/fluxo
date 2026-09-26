@@ -33,10 +33,12 @@ public partial class App : Application
             var achatsRepository = new AchatsRepository(chemins, store);
             var soldesRepository = new SoldesRepository(chemins, store);
             var fenetreRepository = new FenetreRepository(chemins, store);
+            var preferencesRepository = new PreferencesRepository(chemins, store);
             var dialogService = new DialogService();
 
             var mainWindowViewModel = new MainWindowViewModel(
-                configRepository, validationsRepository, postesRepository, achatsRepository, soldesRepository, dialogService);
+                configRepository, validationsRepository, postesRepository, achatsRepository, soldesRepository,
+                preferencesRepository, dialogService);
 
             var mainWindow = new MainWindow { DataContext = mainWindowViewModel };
             AppliquerFenetreEnregistree(mainWindow, fenetreRepository.Charger());

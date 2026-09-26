@@ -34,6 +34,7 @@ public sealed class MoisViewModel : TabViewModelBase
     private readonly AchatsRepository _achatsRepository;
     private readonly SoldesRepository _soldesRepository;
     private readonly ValidationsRepository _validationsRepository;
+    private readonly PreferencesRepository _preferencesRepository;
     private readonly IDialogService _dialogService;
 
     private List<GroupePostes> _groupes = [];
@@ -166,6 +167,7 @@ public sealed class MoisViewModel : TabViewModelBase
         AchatsRepository achatsRepository,
         SoldesRepository soldesRepository,
         ValidationsRepository validationsRepository,
+        PreferencesRepository preferencesRepository,
         IDialogService dialogService)
         : base(NomsMois[mois][..3], estValide)
     {
@@ -175,6 +177,7 @@ public sealed class MoisViewModel : TabViewModelBase
         _achatsRepository = achatsRepository;
         _soldesRepository = soldesRepository;
         _validationsRepository = validationsRepository;
+        _preferencesRepository = preferencesRepository;
         _dialogService = dialogService;
 
         AjouterDepenseCommand = new RelayCommand(() => OuvrirModaleAjout(ModeAchat.Depense));
@@ -328,15 +331,28 @@ public sealed class MoisViewModel : TabViewModelBase
 
     private void Controler()
     {
+        var dossierInitial = _preferencesRepository.Charger().DernierDossierReleve;
+        if (dossierInitial is null || !Directory.Exists(dossierInitial))
+        {
+            dossierInitial = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        }
+
         var dialog = new OpenFileDialog
         {
             Title = "Sélectionner un relevé bancaire (CSV CIC ou xlsx extrait via Claude)",
             Filter = "Relevés bancaires (*.csv;*.xlsx)|*.csv;*.xlsx|Fichiers CSV (*.csv)|*.csv|Fichiers Excel (*.xlsx)|*.xlsx|Tous les fichiers (*.*)|*.*",
+            InitialDirectory = dossierInitial,
         };
 
         if (dialog.ShowDialog() != true)
         {
             return;
+        }
+
+        var dossierChoisi = Path.GetDirectoryName(dialog.FileName);
+        if (dossierChoisi is not null)
+        {
+            _preferencesRepository.Enregistrer(new PreferencesParametres { DernierDossierReleve = dossierChoisi });
         }
 
         try

@@ -29,6 +29,7 @@ public sealed class MainWindowViewModel : ObservableObject
     private readonly AchatsRepository _achatsRepository;
     private readonly SoldesRepository _soldesRepository;
     private readonly ValidationsRepository _validationsRepository;
+    private readonly PreferencesRepository _preferencesRepository;
     private readonly IDialogService _dialogService;
 
     private int _annee;
@@ -83,12 +84,14 @@ public sealed class MainWindowViewModel : ObservableObject
         PostesRepository postesRepository,
         AchatsRepository achatsRepository,
         SoldesRepository soldesRepository,
+        PreferencesRepository preferencesRepository,
         IDialogService dialogService)
     {
         _postesRepository = postesRepository;
         _achatsRepository = achatsRepository;
         _soldesRepository = soldesRepository;
         _validationsRepository = validationsRepository;
+        _preferencesRepository = preferencesRepository;
         _dialogService = dialogService;
 
         _annee = configRepository.Charger().AnneeCourante;
@@ -145,7 +148,8 @@ public sealed class MainWindowViewModel : ObservableObject
             var cleMois = SoldesService.CleMois(Annee, mois);
             OngletsMois.Add(new MoisViewModel(
                 mois, Annee, estValide: validations.ContainsKey(cleMois),
-                _postesRepository, _achatsRepository, _soldesRepository, _validationsRepository, _dialogService));
+                _postesRepository, _achatsRepository, _soldesRepository, _validationsRepository,
+                _preferencesRepository, _dialogService));
         }
     }
 
