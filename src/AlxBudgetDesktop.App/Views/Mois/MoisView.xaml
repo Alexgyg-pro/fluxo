@@ -309,33 +309,41 @@
         </DataGrid>
 
         <!-- Lignes fantômes "à saisir" : lignes du relevé sans saisie correspondante,
-             cliquables, ouvrent la modale d'ajout pré-remplie. -->
-        <ItemsControl Grid.Row="4" ItemsSource="{Binding LignesFantomes}" Margin="0,0,0,0">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Background="{StaticResource BrosseASaisirFond}" Padding="8,6" Margin="0,1,0,0" Cursor="Hand">
-                        <Border.InputBindings>
-                            <MouseBinding MouseAction="LeftClick"
-                                          Command="{Binding DataContext.SaisirDepuisLigneFantomeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                          CommandParameter="{Binding}" />
-                        </Border.InputBindings>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" FontStyle="Italic" Text="{Binding DatePrelevement, StringFormat=dd/MM/yyyy}" />
-                            <TextBlock Grid.Column="1" FontStyle="Italic" Text="{Binding RaisonSociale}" />
-                            <TextBlock Grid.Column="2" FontStyle="Italic" Text="{Binding Montant, StringFormat={}{0:0.00} €}" Margin="0,0,12,0" />
-                            <TextBlock Grid.Column="3" FontStyle="Italic" Text="à saisir" ToolTip="Absente des saisies"
-                                       Foreground="#3F51B5" FontSize="11" VerticalAlignment="Center" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+             cliquables, ouvrent la modale d'ajout pré-remplie. Hauteur plafonnée avec
+             défilement propre : un relevé mensuel peut en compter plusieurs dizaines
+             (ex. un mois jamais saisi) — en Auto sans limite, ça écrasait la grille des
+             opérations au-dessus (et ses badges "orpheline") au point de la rendre
+             invisible. -->
+        <StackPanel Grid.Row="4">
+            <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding LignesFantomes}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource BrosseASaisirFond}" Padding="8,6" Margin="0,1,0,0" Cursor="Hand">
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding DataContext.SaisirDepuisLigneFantomeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                  CommandParameter="{Binding}" />
+                                </Border.InputBindings>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" FontStyle="Italic" Text="{Binding DatePrelevement, StringFormat=dd/MM/yyyy}" />
+                                    <TextBlock Grid.Column="1" FontStyle="Italic" Text="{Binding RaisonSociale}" />
+                                    <TextBlock Grid.Column="2" FontStyle="Italic" Text="{Binding Montant, StringFormat={}{0:0.00} €}" Margin="0,0,12,0" />
+                                    <TextBlock Grid.Column="3" FontStyle="Italic" Text="à saisir" ToolTip="Absente des saisies"
+                                               Foreground="#3F51B5" FontSize="11" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </StackPanel>
 
         <!-- Totaux + boutons d'ajout (bas, toujours visibles même liste vide). -->
         <Grid Grid.Row="5" Margin="0,12,0,0">
