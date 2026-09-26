@@ -18,6 +18,9 @@ public sealed class DialogService : IDialogService
     public void ShowConfirmation(ConfirmationModalViewModel viewModel)
         => ShowModal(new ConfirmationModalWindow { DataContext = viewModel }, viewModel);
 
+    public bool ShowConfirmAction(ConfirmActionModalViewModel viewModel)
+        => ShowModal(new ConfirmActionModalWindow { DataContext = viewModel }, viewModel);
+
     private static bool ShowModal(Window fenetre, ModalViewModelBase viewModel)
     {
         var resultat = false;
