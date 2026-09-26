@@ -14,7 +14,7 @@ public class ReleveXlsxParserTests
         var lignes = new[]
         {
             Ligne("2026-08-03", "SOLDE CRÉDITEUR (ouverture)", null, null, 1000m),
-            Ligne("2026-08-05", "PAIEMENT PSC 0508 TRAPPES", "MARKET TRAPPES CARTE 5299", 12.50m, null),
+            Ligne("2026-08-05", "PAIEMENT PSC 0508 FICTIVILLE", "SUPERETTE DEMO CARTE 5299", 12.50m, null),
             Ligne(null, "TOTAL DES MOUVEMENTS", null, 12.50m, 0m),
             Ligne("2026-09-01", "SOLDE CRÉDITEUR (clôture)", null, null, 987.50m),
         };
@@ -30,15 +30,15 @@ public class ReleveXlsxParserTests
     {
         var lignes = new[]
         {
-            Ligne("2026-08-10", "PRLV SEPA EDF CLIENTS PARTICULI", "GABRIEL NUME", 52.29m, null),
-            Ligne("2026-08-28", "VIR EVERIENCE - HELPLINE", "SALAIRE DE 2026-08", null, 1565.77m),
+            Ligne("2026-08-10", "PRLV SEPA EDF CLIENTS PARTICULI", "REF CLIENT 000001", 52.29m, null),
+            Ligne("2026-08-28", "VIR EMPLOYEUR SARL", "SALAIRE", null, 1500.00m),
         };
 
         var resultat = ReleveXlsxParser.Parse(lignes);
 
         Assert.Equal(2, resultat.Count);
         Assert.Equal(-52.29m, resultat[0].Montant);
-        Assert.Equal(1565.77m, resultat[1].Montant);
+        Assert.Equal(1500.00m, resultat[1].Montant);
     }
 
     [Fact]
@@ -46,12 +46,12 @@ public class ReleveXlsxParserTests
     {
         var lignes = new[]
         {
-            Ligne("2026-08-03", "PAIEMENT PSC 0108 TRAPPES", "MARKET TRAPPES CARTE 5299", 17.60m, null),
+            Ligne("2026-08-03", "PAIEMENT PSC 0108 FICTIVILLE", "SUPERETTE DEMO CARTE 5299", 17.60m, null),
         };
 
         var ligne = Assert.Single(ReleveXlsxParser.Parse(lignes));
 
-        Assert.Equal("MARKET TRAPPES", ligne.RaisonSociale);
+        Assert.Equal("SUPERETTE DEMO", ligne.RaisonSociale);
     }
 
     [Fact]
@@ -59,12 +59,12 @@ public class ReleveXlsxParserTests
     {
         var lignes = new[]
         {
-            Ligne("2026-08-10", "PRLV SEPA LES RESIDENCES", "LOYER:202607", 650.22m, null),
+            Ligne("2026-08-10", "PRLV SEPA IMMOBILIERE DEMO", "LOYER:DEMO", 600.00m, null),
         };
 
         var ligne = Assert.Single(ReleveXlsxParser.Parse(lignes));
 
-        Assert.Equal("LES RESIDENCES", ligne.RaisonSociale);
+        Assert.Equal("IMMOBILIERE DEMO", ligne.RaisonSociale);
     }
 
     [Fact]
