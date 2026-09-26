@@ -7,6 +7,38 @@
 
 ## En cours
 
+### US-008 — Rapprochement persisté, cumulable sur plusieurs relevés
+**En tant qu'**utilisateur, **je veux** que chaque achat rapproché avec succès soit marqué comme tel de façon durable, pour pouvoir contrôler un mois en plusieurs fois avec plusieurs relevés successifs
+**afin de** pouvoir valider un mois même quand ses dernières opérations n'apparaissent que sur le relevé du mois suivant (les cycles bancaires ne suivent pas le calendrier), sans avoir à me souvenir d'une astuce d'usage.
+
+**Contexte :** Le contrôle actuel ("Contrôler avec un relevé") est entièrement éphémère : chaque clic recalcule tout à partir de zéro et **remplace** le résultat précédent, sans rien mémoriser. Or un mois donné peut légitimement avoir des opérations de fin de mois qui n'apparaissent que sur le relevé du mois suivant (ex. un paiement carte du 31/07 encaissé le 03/08, donc visible seulement sur le relevé « suivant »). Avec un seul relevé à la fois, impossible d'obtenir zéro écart pour un tel mois — et « Valider ce mois » exige zéro écart. Découvert en creusant une question du PO sur ce point précis.
+
+**Bonne surprise en creusant le code existant :** le modèle a déjà tout ce qu'il faut, jamais branché à l'écran :
+- `Achat.Rapproche` (bool, persisté) et `Achat.DatePrelevement`/`LibelleReleve` (remplis au rapprochement) existent déjà dans `Achat.cs`.
+- `ReconciliationService.Rapprocher` exclut déjà les achats `Rapproche == true` de la recherche de candidats (`achatsCourant.Where(a => !a.Rapproche)`) — donc un deuxième contrôle avec un autre relevé ne recherche déjà, mécaniquement, que les achats pas encore rapprochés.
+- `AchatsRepository.AppliquerRapprochements(annee, matches)` existe déjà, complet, prêt à marquer `Rapproche=true` et à compléter `DatePrelevement`/`RaisonSociale`/`LibelleReleve` à partir des matches — **mais n'est appelée nulle part**.
+
+**Workflow cible (proposé par le PO) :**
+1. Je contrôle avec le premier relevé — tout ce qui correspond est marqué rapproché (persisté).
+2. Je contrôle avec un deuxième relevé (même mois ou mois suivant) — seuls les achats encore non rapprochés sont recherchés, ce qui marque le reste.
+3. Dès que tous les achats du mois sont rapprochés (peu importe en combien de contrôles), « Valider ce mois » devient possible.
+4. Un moyen de réinitialiser le contrôle d'un mois en cas d'erreur (redémarrer à zéro le rapprochement, sans perdre les achats eux-mêmes).
+
+**Pistes à trancher à la reprise :**
+- Faut-il persister automatiquement à chaque clic sur « Contrôler », ou ajouter une étape de confirmation avant d'écrire (« Confirmer ces N rapprochements ») ? Le PO privilégie l'intuitivité — probablement automatique, à valider.
+- Redéfinir la condition de `PeutValider` : ne plus se baser sur le dernier résultat éphémère (`ControleSansEcart`), mais sur l'état persisté (tous les achats courant/dépenses du mois ont `Rapproche == true`, et aucune ligne du dernier relevé importé n'est restée "à saisir" pour ce mois).
+- Action de réinitialisation : remettre `Rapproche=false` (et vider `DatePrelevement`/`LibelleReleve` complétés automatiquement ?) pour les achats d'un mois donné — portée exacte à définir (un mois entier ? un achat à la fois ?).
+- Revoir la documentation du code qui décrit le contrôle comme « éphémère » (commentaire en tête de `MoisViewModel.cs` notamment) une fois ce changement fait.
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Décision PO sur la confirmation automatique vs manuelle avant persistance.
+- [ ] `AppliquerRapprochements` appelée depuis `Controler()`/`AnalyserControle()`.
+- [ ] `PeutValider` basé sur l'état persisté, plus plusieurs relevés successifs suffisent à couvrir un mois à cheval sur deux cycles bancaires.
+- [ ] Action de réinitialisation du contrôle d'un mois, testée en cas d'erreur.
+- [ ] Testé par le PO sur un cas réel à cheval sur deux relevés (ex. juillet 2026).
+
+---
+
 ### US-006 — Ouvrir le sélecteur de fichier sur le dossier des relevés
 **En tant qu'**utilisateur, **je veux** que le sélecteur de fichier de « Contrôler avec un relevé » s'ouvre directement sur le dossier où atterrissent mes xlsx extraits
 **afin de** ne pas avoir à naviguer manuellement jusqu'au bon dossier à chaque import mensuel.
