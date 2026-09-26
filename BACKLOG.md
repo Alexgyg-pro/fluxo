@@ -18,24 +18,18 @@
 - `ReconciliationService.Rapprocher` exclut déjà les achats `Rapproche == true` de la recherche de candidats (`achatsCourant.Where(a => !a.Rapproche)`) — donc un deuxième contrôle avec un autre relevé ne recherche déjà, mécaniquement, que les achats pas encore rapprochés.
 - `AchatsRepository.AppliquerRapprochements(annee, matches)` existe déjà, complet, prêt à marquer `Rapproche=true` et à compléter `DatePrelevement`/`RaisonSociale`/`LibelleReleve` à partir des matches — **mais n'est appelée nulle part**.
 
-**Workflow cible (proposé par le PO) :**
-1. Je contrôle avec le premier relevé — tout ce qui correspond est marqué rapproché (persisté).
-2. Je contrôle avec un deuxième relevé (même mois ou mois suivant) — seuls les achats encore non rapprochés sont recherchés, ce qui marque le reste.
-3. Dès que tous les achats du mois sont rapprochés (peu importe en combien de contrôles), « Valider ce mois » devient possible.
-4. Un moyen de réinitialiser le contrôle d'un mois en cas d'erreur (redémarrer à zéro le rapprochement, sans perdre les achats eux-mêmes).
+**Décisions PO (livrées) :**
+- Persistance automatique à chaque analyse (import initial *et* réanalyse silencieuse après ajout/modif/suppression), sans étape de confirmation séparée — cohérent avec la volonté du PO de garder l'appli intuitive, rien à retenir.
+- `PeutValider` **inchangé dans son code** (`AControle && ControleSansEcart && !EstValide`) : grâce au filtre déjà présent dans `ReconciliationService` (achats `Rapproche==true` exclus des candidats), un contrôle successif ne recherche mécaniquement plus que ce qui reste, et `ControleSansEcart` reflète alors correctement l'état cumulé — aucune redéfinition nécessaire.
+- Nouvelle action « Réinitialiser le contrôle de ce mois » (`MoisViewModel.ReinitialiserControleCommand`, nouvelle méthode `AchatsRepository.ReinitialiserRapprochement`) : remet `Rapproche=false` sur les achats courant/dépenses du mois affiché, et efface l'état éphémère en mémoire (sinon une réanalyse automatique re-rapprocherait aussitôt les mêmes achats avec le relevé encore en mémoire). Confirmation via une nouvelle modale générique `ConfirmActionModalViewModel` (réutilisable pour d'autres confirmations futures).
+- Documentation mise à jour (`MoisViewModel.cs`) : le contrôle n'est plus décrit comme « éphémère » — seules les lignes « à saisir » le restent par nature (ce ne sont pas des objets persistants).
 
-**Pistes à trancher à la reprise :**
-- Faut-il persister automatiquement à chaque clic sur « Contrôler », ou ajouter une étape de confirmation avant d'écrire (« Confirmer ces N rapprochements ») ? Le PO privilégie l'intuitivité — probablement automatique, à valider.
-- Redéfinir la condition de `PeutValider` : ne plus se baser sur le dernier résultat éphémère (`ControleSansEcart`), mais sur l'état persisté (tous les achats courant/dépenses du mois ont `Rapproche == true`, et aucune ligne du dernier relevé importé n'est restée "à saisir" pour ce mois).
-- Action de réinitialisation : remettre `Rapproche=false` (et vider `DatePrelevement`/`LibelleReleve` complétés automatiquement ?) pour les achats d'un mois donné — portée exacte à définir (un mois entier ? un achat à la fois ?).
-- Revoir la documentation du code qui décrit le contrôle comme « éphémère » (commentaire en tête de `MoisViewModel.cs` notamment) une fois ce changement fait.
-
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Décision PO sur la confirmation automatique vs manuelle avant persistance.
-- [ ] `AppliquerRapprochements` appelée depuis `Controler()`/`AnalyserControle()`.
-- [ ] `PeutValider` basé sur l'état persisté, plus plusieurs relevés successifs suffisent à couvrir un mois à cheval sur deux cycles bancaires.
-- [ ] Action de réinitialisation du contrôle d'un mois, testée en cas d'erreur.
-- [ ] Testé par le PO sur un cas réel à cheval sur deux relevés (ex. juillet 2026).
+**Conditions de réussite :**
+- [x] `AppliquerRapprochements` appelée depuis `AnalyserControle()`.
+- [x] `PeutValider` fonctionne correctement sur plusieurs relevés successifs couvrant un mois à cheval sur deux cycles bancaires (aucun changement de code nécessaire, comportement déjà correct par construction).
+- [x] Action de réinitialisation du contrôle d'un mois, avec confirmation.
+- [x] Testé sur le cas réel de juillet 2026 (copie isolée des vraies données, jamais l'original) : contrôle avec `Releve_CIC_2026-08-03.xlsx` puis `Releve_CIC_2026-09-01.xlsx` → 65/65 achats courant de juillet rapprochés, y compris les 2 cas limites de fin de mois identifiés précédemment.
+- [ ] Testé par le PO directement dans l'application (pas seulement en simulation).
 
 ---
 

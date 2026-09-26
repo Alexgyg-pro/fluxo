@@ -198,13 +198,18 @@
             </StackPanel>
         </DockPanel>
 
-        <!-- Barre de contrôle de rapprochement (éphémère) + validation du mois. -->
+        <!-- Barre de contrôle de rapprochement (rapprochements persistés) + validation du mois. -->
         <Border Grid.Row="2" BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1"
                 CornerRadius="4" Padding="12" Margin="0,0,0,12">
             <StackPanel>
                 <DockPanel>
-                    <Button DockPanel.Dock="Left" Content="{Binding TexteBoutonControle}"
-                            Command="{Binding ControlerCommand}" Padding="8,4" />
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Button Content="{Binding TexteBoutonControle}"
+                                Command="{Binding ControlerCommand}" Padding="8,4" />
+                        <Button Content="Réinitialiser le contrôle" Command="{Binding ReinitialiserControleCommand}"
+                                Padding="8,4" Margin="8,0,0,0"
+                                Visibility="{Binding AControle, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
+                    </StackPanel>
 
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
                         <TextBlock VerticalAlignment="Center" Margin="0,0,8,0"

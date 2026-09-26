@@ -20,4 +20,8 @@ public interface IDialogService
 
     /// <summary>Modale de confirmation générique (succès/échec), fermée par OK.</summary>
     void ShowConfirmation(ConfirmationModalViewModel viewModel);
+
+    /// <summary>true si l'action a été confirmée. Contrairement à ShowConfirmDelete, aucun
+    /// wording de suppression en dur — pour n'importe quelle action à confirmer.</summary>
+    bool ShowConfirmAction(ConfirmActionModalViewModel viewModel);
 }

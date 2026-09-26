@@ -17,8 +17,14 @@ namespace AlxBudgetDesktop.App.ViewModels.Mois;
 
 /// <summary>
 /// Onglet d'un mois : bandeau de soldes (avec calage manuel), liste des opérations,
-/// saisie manuelle (dépense/recette) et contrôle de rapprochement bancaire éphémère
-/// (badges "orpheline"/"à saisir", ligne fantôme, validation/dévalidation de mois).
+/// saisie manuelle (dépense/recette) et contrôle de rapprochement bancaire (badges
+/// "orpheline"/"à saisir", ligne fantôme, validation/dévalidation de mois). Un
+/// rapprochement réussi est persisté (Achat.Rapproche) dès qu'il est trouvé — voir
+/// AnalyserControle : ça permet de contrôler un même mois en plusieurs fois avec
+/// plusieurs relevés successifs (les cycles bancaires ne suivent pas le calendrier),
+/// chaque contrôle ne recherchant plus que ce qui reste à rapprocher (US-008). Seules
+/// les lignes "à saisir" restent recalculées à chaque analyse : ce sont des lignes du
+/// relevé importé, pas un objet persistant de l'appli.
 /// L'écran Import CSV complet (persisté, avec ses 3 blocs de confirmation) est un
 /// écran séparé, développé dans une session dédiée ultérieure.
 /// </summary>
@@ -119,7 +125,7 @@ public sealed class MoisViewModel : TabViewModelBase
     public bool CorrectionTrPositive => CorrectionTr >= 0;
     public bool CorrectionEpargnePositive => CorrectionEpargne >= 0;
 
-    // --- Contrôle de rapprochement bancaire (éphémère) ---
+    // --- Contrôle de rapprochement bancaire (rapprochements persistés, cf. doc de classe) ---
 
     private bool _aControle;
     public bool AControle { get => _aControle; private set => SetProperty(ref _aControle, value); }
@@ -155,6 +161,7 @@ public sealed class MoisViewModel : TabViewModelBase
     public RelayCommand<AchatLigneViewModel> SupprimerCommand { get; }
     public RelayCommand OuvrirCalageCommand { get; }
     public RelayCommand ControlerCommand { get; }
+    public RelayCommand ReinitialiserControleCommand { get; }
     public RelayCommand<LigneFantomeViewModel> SaisirDepuisLigneFantomeCommand { get; }
     public RelayCommand ValiderCommand { get; }
     public RelayCommand DevaliderCommand { get; }
@@ -186,6 +193,7 @@ public sealed class MoisViewModel : TabViewModelBase
         SupprimerCommand = new RelayCommand<AchatLigneViewModel>(Supprimer);
         OuvrirCalageCommand = new RelayCommand(OuvrirCalage);
         ControlerCommand = new RelayCommand(Controler);
+        ReinitialiserControleCommand = new RelayCommand(ReinitialiserControle);
         SaisirDepuisLigneFantomeCommand = new RelayCommand<LigneFantomeViewModel>(SaisirDepuisLigneFantome);
         ValiderCommand = new RelayCommand(Valider, () => PeutValider);
         DevaliderCommand = new RelayCommand(Devalider, () => EstValide);
@@ -385,6 +393,15 @@ public sealed class MoisViewModel : TabViewModelBase
 
         _resultatControle = ReconciliationService.Rapprocher(achatsCourantDepenses, lignes);
 
+        // Persiste immédiatement ce qui vient d'être rapproché (Achat.Rapproche) — c'est ce
+        // qui permet de contrôler un même mois en plusieurs fois avec plusieurs relevés
+        // successifs : la prochaine analyse (ce mois-ci ou un autre) ne recherchera plus,
+        // via ReconciliationService, que les achats pas encore rapprochés.
+        if (_resultatControle.Matches.Count > 0)
+        {
+            _achatsRepository.AppliquerRapprochements(Annee, _resultatControle.Matches);
+        }
+
         var orphelinesDuMois = _resultatControle.AchatsNonRapproches
             .Where(a => a.DateAchat.Year == Annee && a.DateAchat.Month - 1 == Mois)
             .Select(a => a.Id)
@@ -414,6 +431,48 @@ public sealed class MoisViewModel : TabViewModelBase
         AControle = true;
         OnPropertyChanged(nameof(TexteBoutonControle));
         NotifierEtatValidation();
+    }
+
+    /// <summary>Remet à zéro le contrôle de ce mois en cas d'erreur : dé-rapproche les
+    /// achats concernés (sans les supprimer) et efface l'état éphémère du dernier
+    /// contrôle, pour repartir d'un "aucun contrôle lancé" — sans quoi une réanalyse
+    /// automatique (cf. Rafraichir) re-rapprocherait aussitôt les mêmes achats avec le
+    /// relevé encore en mémoire.</summary>
+    private void ReinitialiserControle()
+    {
+        var achatsAnnee = _achatsRepository.ListerAchats(Annee);
+        var recettes = SoldesService.PostesRecette(_groupes);
+        var idsARapprocher = achatsAnnee
+            .Where(a => a.DateAchat.Year == Annee && a.DateAchat.Month - 1 == Mois)
+            .Where(a => a.Compte == Compte.Courant && !EstRecette(a, recettes) && a.Rapproche)
+            .Select(a => a.Id)
+            .ToList();
+
+        var vm = new ConfirmActionModalViewModel(
+            "Réinitialiser le contrôle de ce mois ?",
+            $"{idsARapprocher.Count} opération(s) rapprochée(s) redeviendront à contrôler. " +
+            "Les opérations elles-mêmes ne sont pas supprimées.",
+            "Réinitialiser");
+
+        if (!_dialogService.ShowConfirmAction(vm))
+        {
+            return;
+        }
+
+        if (idsARapprocher.Count > 0)
+        {
+            _achatsRepository.ReinitialiserRapprochement(Annee, idsARapprocher);
+        }
+
+        _resultatControle = null;
+        _dernieresLignesReleve = null;
+        AControle = false;
+        LignesFantomes.Clear();
+        ResumeControle = "";
+        ControleSansEcart = false;
+        OnPropertyChanged(nameof(TexteBoutonControle));
+
+        Rafraichir();
     }
 
     private void SaisirDepuisLigneFantome(LigneFantomeViewModel? ligne)

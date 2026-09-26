@@ -140,4 +140,38 @@ public sealed partial class AchatsRepository(DataPathProvider chemins, JsonFileS
 
         store.SaveJsonlAtomic(Chemin(annee), achats);
     }
+
+    /// <summary>Annule le rapprochement (remet rapproche=false) des achats donnés — permet
+    /// de recommencer le contrôle d'un mois en cas d'erreur, sans perdre les achats
+    /// eux-mêmes ni leurs autres champs (dateAchat, postes, etc.).</summary>
+    public void ReinitialiserRapprochement(int annee, IReadOnlyList<Guid> ids)
+    {
+        var idsAReinitialiser = ids.ToHashSet();
+        var achats = ListerAchats(annee);
+
+        for (var i = 0; i < achats.Count; i++)
+        {
+            if (!idsAReinitialiser.Contains(achats[i].Id))
+            {
+                continue;
+            }
+
+            var a = achats[i];
+            achats[i] = new Achat
+            {
+                Id = a.Id,
+                Rapproche = false,
+                DateAchat = a.DateAchat,
+                Etiquette = a.Etiquette,
+                DatePrelevement = a.DatePrelevement,
+                RaisonSociale = a.RaisonSociale,
+                MontantAchat = a.MontantAchat,
+                Compte = a.Compte,
+                Postes = a.Postes,
+                LibelleReleve = a.LibelleReleve,
+            };
+        }
+
+        store.SaveJsonlAtomic(Chemin(annee), achats);
+    }
 }
