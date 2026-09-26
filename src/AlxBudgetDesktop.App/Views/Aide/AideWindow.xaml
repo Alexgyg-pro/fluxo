@@ -1,0 +1,29 @@
+<Window x:Class="AlxBudgetDesktop.App.Views.Aide.AideWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Aide — alxBudgetDesktop" Height="600" Width="900"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Colonne des thèmes : ItemsControl + Button, pas de ListBox/Selector
+             (même raison qu'ailleurs dans l'appli, cf. Styles.xaml — US-001). -->
+        <ItemsControl Grid.Column="0" ItemsSource="{Binding Sujets}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Button Content="{Binding Titre}" Style="{StaticResource StyleSujetAideBouton}"
+                            Command="{Binding DataContext.SelectionnerSujetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            CommandParameter="{Binding}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Border Grid.Column="2" BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1" CornerRadius="4">
+            <FlowDocumentScrollViewer Document="{Binding Contenu}" Padding="20" VerticalScrollBarVisibility="Auto" />
+        </Border>
+    </Grid>
+</Window>

@@ -1,12 +1,10 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using AlxBudgetDesktop.App.Mvvm;
 using AlxBudgetDesktop.App.ViewModels.Admin;
+using AlxBudgetDesktop.App.ViewModels.Aide;
 using AlxBudgetDesktop.App.ViewModels.Budget;
-using AlxBudgetDesktop.App.ViewModels.Dialogs;
 using AlxBudgetDesktop.App.ViewModels.Mois;
-using AlxBudgetDesktop.Data.Paths;
 using AlxBudgetDesktop.Data.Repositories;
 using AlxBudgetDesktop.Domain.Services;
 
@@ -121,22 +119,9 @@ public sealed class MainWindowViewModel : ObservableObject
         _ongletSelectionne.EstSelectionne = true;
     }
 
-    /// <summary>Ouvre le mode d'emploi (README.txt publié, ou README-utilisateur.txt
-    /// à la racine du dépôt en dotnet run) avec l'application par défaut du système.</summary>
-    private void OuvrirAide()
-    {
-        var chemin = CheminAideResolver.Resoudre();
-        if (chemin is null)
-        {
-            _dialogService.ShowConfirmation(new ConfirmationModalViewModel(
-                "Aide introuvable",
-                "Le mode d'emploi (README.txt) n'a pas été trouvé à côté de l'application.",
-                estSucces: false));
-            return;
-        }
-
-        Process.Start(new ProcessStartInfo(chemin) { UseShellExecute = true });
-    }
+    /// <summary>Ouvre l'aide en ligne (fenêtre à thèmes, contenu Markdown embarqué) —
+    /// non modale, cf. IDialogService.ShowAide.</summary>
+    private void OuvrirAide() => _dialogService.ShowAide(new AideViewModel());
 
     private void ConstruireOngletsMois()
     {

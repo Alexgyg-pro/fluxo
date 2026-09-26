@@ -99,6 +99,33 @@
         </Setter>
     </Style>
 
+    <!-- Bouton "thème" de la colonne de gauche de la fenêtre d'aide : liste
+         verticale, pleine largeur, surbrillance sur le thème sélectionné. -->
+    <Style x:Key="StyleSujetAideBouton" TargetType="Button">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="Margin" Value="0,0,0,2" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fond" Padding="{TemplateBinding Padding}" CornerRadius="4" Background="Transparent">
+                        <ContentPresenter HorizontalAlignment="Left" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding EstSelectionne}" Value="True">
+                            <Setter TargetName="Fond" Property="Background" Value="{StaticResource BrosseASaisirFond}" />
+                        </DataTrigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fond" Property="Background" Value="#F5F5F5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="StyleBoutonDanger" TargetType="Button">
         <Setter Property="Foreground" Value="White" />
         <Setter Property="Background" Value="{StaticResource BrosseDanger}" />
