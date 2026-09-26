@@ -7,6 +7,23 @@
 
 ## En cours
 
+### US-010 — Afficher les relevés déjà pris en compte pour un mois
+**En tant qu'**utilisateur, **je veux** voir quelque part quels relevés (fichiers) ont déjà été importés pour contrôler un mois donné
+**afin de** ne pas avoir à me souvenir moi-même de ceux déjà utilisés, surtout quand un mois nécessite plusieurs relevés successifs (US-008) et que leur période réelle ne correspond pas à leur nom de fichier.
+
+**Contexte :** Remarque du PO en testant US-008 sur juillet 2026 (qui a demandé deux relevés successifs pour être complètement rapproché). Rien dans l'appli ne garde trace de quels fichiers ont déjà été importés pour un mois — seul l'état cumulé (rapproché/pas rapproché) est visible, pas l'historique des imports eux-mêmes.
+
+**Pistes à trancher à la reprise :**
+- Où l'afficher : dans le bandeau de contrôle (à côté du résumé "X orpheline(s), Y à saisir"), ou dans un historique consultable à part ?
+- Que mémoriser exactement : juste le nom du fichier importé (simple, mais perd le contexte si le fichier est renommé/déplacé), ou aussi sa période réelle détectée (min/max des dates de ses lignes) pour lever l'ambiguïté du nommage CIC (le nom du fichier ne correspond pas à sa période de couverture, cf. US-005/US-008) ?
+- Persistant (survit à la fermeture de l'appli, utile puisqu'un mois peut être contrôlé sur plusieurs sessions) ou juste pour la session en cours ?
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Décision PO sur l'emplacement et le contenu affiché.
+- [ ] L'historique des relevés importés pour un mois est visible et persiste entre les sessions.
+
+---
+
 ### US-008 — Rapprochement persisté, cumulable sur plusieurs relevés
 **En tant qu'**utilisateur, **je veux** que chaque achat rapproché avec succès soit marqué comme tel de façon durable, pour pouvoir contrôler un mois en plusieurs fois avec plusieurs relevés successifs
 **afin de** pouvoir valider un mois même quand ses dernières opérations n'apparaissent que sur le relevé du mois suivant (les cycles bancaires ne suivent pas le calendrier), sans avoir à me souvenir d'une astuce d'usage.
