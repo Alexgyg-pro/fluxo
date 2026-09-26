@@ -11,13 +11,17 @@
 **En tant qu'**utilisateur, **je veux** que le sélecteur de fichier de « Contrôler avec un relevé » s'ouvre directement sur le dossier où atterrissent mes xlsx extraits
 **afin de** ne pas avoir à naviguer manuellement jusqu'au bon dossier à chaque import mensuel.
 
-**Contexte :** Remarque du PO pendant le test de US-005. Petite amélioration de confort, pas bloquante — à faire quand l'occasion se présente.
+**Contexte :** Bug remonté par le PO : le sélecteur pointait par défaut sur un chemin de développement (repo `sample-data\`), pas pertinent en usage réel — chaque utilisateur range ses relevés où il veut, impossible de deviner un chemin figé.
 
-**Piste à trancher à la reprise :** quel dossier par défaut (`InitialDirectory` du `OpenFileDialog` dans `MoisViewModel.Controler()`) — le dossier Téléchargements de l'utilisateur (`Environment.SpecialFolder.UserProfile` + `Downloads`, en tenant compte de la redirection OneDrive déjà observée sur cette machine), ou un dossier dédié à configurer ? Mémoriser aussi le dernier dossier utilisé serait plus robuste qu'un chemin figé.
+**Décisions PO (livrées) :**
+- Dossier par défaut au tout premier usage : dossier Documents de l'utilisateur (`Environment.SpecialFolder.MyDocuments`).
+- Ensuite, mémorisation automatique du dernier dossier utilisé (`PreferencesRepository`, nouveau `preferences.json`, même esprit que `fenetre.json` pour la fenêtre) — pas de champ de configuration séparé à remplir : le PO « définit son emplacement » simplement en y naviguant une première fois (ex. `D:\Alejandro\Mes Documents\Fichiers de travail\Administration\Banque\Relevés`), l'appli s'en souvient ensuite.
+- `MoisViewModel` reçoit désormais `PreferencesRepository` en plus des autres repositories (fil de construction mis à jour : `App.xaml.cs` → `MainWindowViewModel` → `MoisViewModel`).
 
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Décision PO sur le dossier par défaut (ou mémorisation du dernier dossier utilisé).
-- [ ] Le sélecteur s'ouvre sur ce dossier au lieu du dossier par défaut de Windows.
+**Conditions de réussite :**
+- [x] Décision PO sur le dossier par défaut (Documents) et la mémorisation (dernier dossier utilisé).
+- [x] Le sélecteur s'ouvre sur ce dossier au lieu du dossier par défaut de Windows.
+- [ ] Testé par le PO dans l'appli (le dossier choisi la fois précédente est bien réutilisé).
 
 ---
 
