@@ -47,8 +47,32 @@ PREMIERS PAS
   par votre banque, si vos saisies ont pris du retard.
 
 - CONTRÔLE BANCAIRE : le bouton "Contrôler avec un relevé" compare vos
-  saisies à un relevé bancaire (fichier CSV téléchargé depuis le site
-  de votre banque) pour repérer ce qui manque des deux côtés.
+  saisies à un relevé bancaire — un export CSV téléchargé depuis le
+  site de votre banque, ou un fichier xlsx (si vous faites extraire vos
+  relevés PDF autrement, voir docs/prompt-extraction-releve-cic.md) —
+  pour repérer ce qui manque des deux côtés :
+    - "à saisir" : une opération présente sur le relevé mais jamais
+      saisie dans l'appli — cliquez dessus pour l'ajouter directement,
+      champs déjà pré-remplis.
+    - "orpheline" : l'inverse, une opération saisie chez vous qui ne se
+      retrouve sur aucun relevé importé — à vérifier (montant, date,
+      ou peut-être payée autrement qu'avec ce compte).
+  Un rapprochement réussi est mémorisé définitivement : vous pouvez
+  contrôler un même mois plusieurs fois, avec plusieurs relevés
+  successifs, sans jamais perdre ce qui a déjà été validé. En cas
+  d'erreur (mauvais fichier importé par mégarde...), le bouton
+  "Réinitialiser le contrôle" remet ce mois à zéro sans supprimer vos
+  opérations.
+
+  ATTENTION AU PIÈGE DU 1er DU MOIS : un relevé bancaire est daté du
+  jour où la banque l'a édité, pas du mois qu'il couvre réellement. Un
+  relevé "au 01/08" contient en réalité l'essentiel de JUILLET, pas
+  août ! Et une carte utilisée le 31/07 peut n'être débitée que le
+  03/08 par la banque — cette opération n'apparaîtra alors que sur le
+  relevé SUIVANT. Conséquence pratique : un mois demande souvent 2
+  relevés successifs (parfois 3) pour arriver à zéro écart. Ce n'est
+  pas une erreur si "Valider ce mois" n'apparaît pas tout de suite —
+  importez le relevé suivant.
 
 - VALIDER UN MOIS : une fois un mois sans écart au contrôle, le
   bouton "Valider ce mois" le marque comme bouclé — une pastille
