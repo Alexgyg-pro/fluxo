@@ -18,6 +18,11 @@
     <Resource Include="Aide\*.md" />
   </ItemGroup>
 
+  <!-- Nom d'affichage "Fluxo" (executable, proprietes du fichier) sans toucher
+       a l'organisation interne du code : RootNamespace explicite pour eviter
+       tout effet de bord (il vaut AssemblyName par defaut si non precise), et
+       les projets Domain/Data gardent leur AssemblyName d'origine (une seule
+       reference XAML les cible par nom d'assembly : AchatModalWindow.xaml). -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -25,6 +30,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Resources\icone.ico</ApplicationIcon>
+    <AssemblyName>Fluxo</AssemblyName>
+    <RootNamespace>AlxBudgetDesktop.App</RootNamespace>
+    <AssemblyTitle>Fluxo</AssemblyTitle>
+    <Product>Fluxo</Product>
   </PropertyGroup>
 
   <!-- Copie le mode d'emploi utilisateur (suivi par git, à la racine du dépôt) dans
