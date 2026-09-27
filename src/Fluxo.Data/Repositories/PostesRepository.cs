@@ -9,27 +9,19 @@ public sealed class PostesRepository(DataPathProvider chemins, JsonFileStore sto
 {
     private string Chemin => chemins.CheminFichier("postes.json");
 
-    /// <summary>Seed initial — inspiré de POSTES_DEFAUT côté alxBudget (server/src/store/defaults.ts),
-    /// à l'ordre des groupes près (Revenus en tête, demande PO) et généricisé pour rester neutre
-    /// dans un projet destiné à être partagé publiquement (ex. "Huissier" retiré).</summary>
+    /// <summary>Seed initial, entièrement passe-partout — validé par le PO avant codage en dur
+    /// (aucune référence personnelle, projet destiné à être partagé publiquement). Les noms de
+    /// groupes/postes marqués via PostesSpeciaux restent figés par le code métier.</summary>
     public static List<GroupePostes> PostesDefaut() =>
     [
-        new() { Nom = PostesSpeciaux.GroupeRevenus, Postes = ["Salaire", PostesSpeciaux.TicketsRestaurant, PostesSpeciaux.EpargneRetrait, "Divers"] },
-        new() { Nom = "Dépenses incontournables", Postes = ["Loyer + charges", "Électricité", "Internet", "Téléphone portable"] },
-        new()
-        {
-            Nom = "Dépenses domestiques",
-            Postes =
-            [
-                "Alimentation", "Restauration", "Alcool", "Consommables",
-                "Mobilier et décoration", "Vêtements et accessoires", "Sorties et dépenses culturelles",
-            ],
-        },
-        new() { Nom = "Transports", Postes = ["Abonnement transports"] },
+        new() { Nom = PostesSpeciaux.GroupeRevenus, Postes = ["Salaire", PostesSpeciaux.TicketsRestaurant, PostesSpeciaux.EpargneRetrait, "Autres revenus"] },
+        new() { Nom = "Logement", Postes = ["Loyer ou crédit immobilier", "Charges et copropriété", "Électricité et gaz", "Eau", "Internet et téléphone", "Assurance habitation"] },
+        new() { Nom = "Vie quotidienne", Postes = ["Alimentation", "Restauration", "Vêtements et accessoires", "Santé", "Loisirs et culture"] },
+        new() { Nom = "Transports", Postes = ["Carburant et transports en commun", "Assurance et entretien véhicule"] },
         new() { Nom = PostesSpeciaux.GroupeEpargne, Postes = [PostesSpeciaux.EpargneDepot] },
-        new() { Nom = "Dépenses extraordinaires", Postes = ["Imprévus"] },
-        new() { Nom = "Dépenses diverses", Postes = ["Frais bancaires"] },
-        new() { Nom = PostesSpeciaux.GroupeRemises, Postes = ["Cagnottes fidélité"] },
+        new() { Nom = "Imprévus", Postes = ["Imprévus"] },
+        new() { Nom = "Frais divers", Postes = ["Frais bancaires", "Abonnements"] },
+        new() { Nom = PostesSpeciaux.GroupeRemises, Postes = ["Remises et avoirs"] },
     ];
 
     public List<GroupePostes> Charger()
