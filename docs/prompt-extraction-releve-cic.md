@@ -2,9 +2,9 @@
 
 À utiliser chaque mois avec Claude (claude.ai), en joignant le PDF du relevé
 CIC téléchargé depuis l'espace client. Le prompt est figé pour garantir une
-structure stable d'un mois sur l'autre — l'import xlsx d'alxBudgetDesktop
-attend exactement cette forme (voir `AlxBudgetDesktop.Data.Xlsx.XlsxReleveFileReader`
-et `AlxBudgetDesktop.Domain.Csv.ReleveXlsxParser`).
+structure stable d'un mois sur l'autre — l'import xlsx de Fluxo attend
+exactement cette forme (voir `Fluxo.Data.Xlsx.XlsxReleveFileReader`
+et `Fluxo.Domain.Csv.ReleveXlsxParser`).
 
 **Ne pas improviser une variante du prompt sans mettre à jour ce fichier ET
 vérifier que l'import fonctionne toujours** (le nom de l'onglet et les

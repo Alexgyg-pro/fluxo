@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fluxo.Domain\Fluxo.Domain.csproj" />
+    <ProjectReference Include="..\Fluxo.Data\Fluxo.Data.csproj" />
+  </ItemGroup>
+
+  <!-- Incluse comme ressource WPF (pas seulement ApplicationIcon, qui ne couvre que
+       l'icône du fichier .exe dans l'Explorateur) pour que Window.Icon puisse la
+       référencer en pack URI et afficher l'icône dans la barre de titre / Alt-Tab. -->
+  <ItemGroup>
+    <Resource Include="Resources\icone.ico" />
+  </ItemGroup>
+
+  <!-- Contenu de l'aide en ligne, embarqué dans l'exécutable (pas de fichiers
+       à côté de l'exe à gérer) — voir AideViewModel.ChargerContenu. -->
+  <ItemGroup>
+    <Resource Include="Aide\*.md" />
+  </ItemGroup>
+
+  <!-- AssemblyName="Fluxo" (nom du .exe final) volontairement decouple du nom
+       de fichier du projet (Fluxo.App.csproj, coherent avec Fluxo.Domain/
+       Fluxo.Data) : RootNamespace fixe explicitement pour que les
+       namespaces reels du code (Fluxo.App.*) restent alignes avec ce que
+       RootNamespace aurait valu par defaut sans ce decouplage. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\icone.ico</ApplicationIcon>
+    <AssemblyName>Fluxo</AssemblyName>
+    <RootNamespace>Fluxo.App</RootNamespace>
+    <AssemblyTitle>Fluxo</AssemblyTitle>
+    <Product>Fluxo</Product>
+  </PropertyGroup>
+
+  <!-- Copie le mode d'emploi utilisateur (suivi par git, à la racine du dépôt) dans
+       le dossier de publication à chaque "dotnet publish", pour ne jamais distribuer
+       une version obsolète du README.txt à côté de l'exécutable. -->
+  <Target Name="CopierReadmeUtilisateur" AfterTargets="Publish">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\..\README-utilisateur.txt"
+          DestinationFiles="$(PublishDir)README.txt" />
+  </Target>
+
+</Project>
