@@ -94,7 +94,7 @@ OÙ SONT MES DONNÉES ?
 Vos données (uniquement du texte, jamais envoyées nulle part) sont
 stockées automatiquement dans ce dossier :
 
-    %LOCALAPPDATA%\alxBudgetDesktop\
+    %LOCALAPPDATA%\Fluxo\
 
 Astuce : collez ce chemin (avec les %) dans la barre d'adresse de
 l'Explorateur Windows pour y accéder directement. C'est ce dossier

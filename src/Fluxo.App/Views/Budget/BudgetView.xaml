@@ -1,0 +1,201 @@
+<UserControl x:Class="Fluxo.App.Views.Budget.BudgetView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600">
+
+    <UserControl.Resources>
+        <!-- Style de base d'une cellule mensuelle : alignement, et mise en forme des
+             lignes groupe/solde. Chaque colonne de mois dérive ce style pour n'ajouter
+             que son propre déclencheur "projeté" (une colonne WPF n'a pas de
+             DataContext, donc pas moyen de mutualiser ça en un seul style paramétré). -->
+        <Style x:Key="StyleCelluleMoisBase" TargetType="DataGridCell">
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+            <Setter Property="Padding" Value="6,4" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding EstGroupe}" Value="True">
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding EstSolde}" Value="True">
+                    <Setter Property="FontWeight" Value="Bold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StyleCelluleMois0" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois0EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois1" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois1EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois2" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois2EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois3" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois3EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois4" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois4EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois5" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois5EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois6" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois6EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois7" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois7EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois8" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois8EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois9" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois9EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois10" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois10EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleCelluleMois11" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Mois11EstProjete, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BrosseProjeteFond}" />
+                    <Setter Property="Foreground" Value="{StaticResource BrosseProjeteTexte}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Colonne Total : plus marquée que le reste du tableau (fond distinct,
+             bordure gauche, texte gras en permanence, pas seulement groupe/solde). -->
+        <Style x:Key="StyleCelluleTotal" TargetType="DataGridCell" BasedOn="{StaticResource StyleCelluleMoisBase}">
+            <Setter Property="Background" Value="#F2F2F2" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrosseBordure}" />
+            <Setter Property="BorderThickness" Value="1,0,0,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Cartes de cumul (toutes années confondues). -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <Border BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1" CornerRadius="4" Padding="16" Margin="0,0,16,0">
+                <StackPanel>
+                    <TextBlock Text="🏦 Solde compte courant (cumul)" Foreground="{StaticResource BrosseAtténuee}" Margin="0,0,0,6" />
+                    <TextBlock Text="{Binding SoldeCourantCumul, StringFormat={}{0:0.00} €}" FontSize="20" FontWeight="SemiBold" />
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1" CornerRadius="4" Padding="16" Margin="0,0,16,0">
+                <StackPanel>
+                    <TextBlock Text="💰 Solde épargne (cumul)" Foreground="{StaticResource BrosseAtténuee}" Margin="0,0,0,6" />
+                    <TextBlock Text="{Binding SoldeEpargneCumul, StringFormat={}{0:0.00} €}" FontSize="20" FontWeight="SemiBold" />
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1" CornerRadius="4" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="🍽️ Solde tickets restaurant (cumul)" Foreground="{StaticResource BrosseAtténuee}" Margin="0,0,0,6" />
+                    <TextBlock Text="{Binding SoldeTicketsRestaurantCumul, StringFormat={}{0:0.00} €}" FontSize="20" FontWeight="SemiBold" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Tableau pivot : groupes puis postes (indentés) en lignes, 12 mois + Total
+             en colonnes. Lecture seule, les cellules des mois projetés (moyenne des
+             mois passés renseignés) sont teintées en orange. -->
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Lignes}" AutoGenerateColumns="False" IsReadOnly="True"
+                  HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="{StaticResource BrosseLigneGrille}"
+                  CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeRows="False">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding EstGroupe}" Value="True">
+                            <Setter Property="Background" Value="#F5F5F5" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding EstSolde}" Value="True">
+                            <Setter Property="Background" Value="#E2E2E2" />
+                            <Setter Property="BorderBrush" Value="{StaticResource BrosseAtténuee}" />
+                            <Setter Property="BorderThickness" Value="0,2,0,0" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Poste" Binding="{Binding Libelle}" Width="220" />
+                <DataGridTextColumn Header="Jan" Binding="{Binding [0], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois0}" />
+                <DataGridTextColumn Header="Fév" Binding="{Binding [1], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois1}" />
+                <DataGridTextColumn Header="Mar" Binding="{Binding [2], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois2}" />
+                <DataGridTextColumn Header="Avr" Binding="{Binding [3], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois3}" />
+                <DataGridTextColumn Header="Mai" Binding="{Binding [4], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois4}" />
+                <DataGridTextColumn Header="Juin" Binding="{Binding [5], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois5}" />
+                <DataGridTextColumn Header="Juil" Binding="{Binding [6], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois6}" />
+                <DataGridTextColumn Header="Août" Binding="{Binding [7], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois7}" />
+                <DataGridTextColumn Header="Sep" Binding="{Binding [8], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois8}" />
+                <DataGridTextColumn Header="Oct" Binding="{Binding [9], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois9}" />
+                <DataGridTextColumn Header="Nov" Binding="{Binding [10], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois10}" />
+                <DataGridTextColumn Header="Déc" Binding="{Binding [11], Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="72" CellStyle="{StaticResource StyleCelluleMois11}" />
+                <DataGridTextColumn Header="Total" Binding="{Binding Total, Converter={StaticResource ConvertisseurMontantOuTiret}}" Width="90" CellStyle="{StaticResource StyleCelluleTotal}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

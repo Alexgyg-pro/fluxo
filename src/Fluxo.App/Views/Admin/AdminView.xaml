@@ -1,0 +1,81 @@
+<UserControl x:Class="Fluxo.App.Views.Admin.AdminView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:adm="clr-namespace:Fluxo.App.ViewModels.Admin"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="0,0,16,24">
+
+        <!-- Année gérée. -->
+        <TextBlock Text="Année gérée" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+        <TextBlock Text="Un fichier de données distinct par année (achats, soldes, validations) — les groupes/postes restent partagés entre toutes les années."
+                   TextWrapping="Wrap" Foreground="{StaticResource BrosseAtténuee}" Margin="0,0,0,10" />
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+            <TextBox Text="{Binding AnneeTexte, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,8,0" />
+            <Button Content="Enregistrer l'année" Command="{Binding EnregistrerAnneeCommand}" Padding="10,6" />
+        </StackPanel>
+        <TextBlock Text="{Binding ErreurAnnee}" Foreground="{StaticResource BrosseDanger}" Margin="0,0,0,8"
+                   Visibility="{Binding AErreurAnnee, Converter={StaticResource ConvertisseurBoolVersVisibilite}}" />
+
+        <Separator Margin="0,16" />
+
+        <!-- Postes et groupes. -->
+        <DockPanel Margin="0,0,0,8">
+            <TextBlock Text="Postes et groupes" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+            <Button DockPanel.Dock="Right" Content="+ Groupe" Command="{Binding AjouterGroupeCommand}"
+                    Padding="8,4" HorizontalAlignment="Right" />
+        </DockPanel>
+        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource BrosseAtténuee}" Margin="0,0,0,12">
+            Rien n'est enregistré tant que vous n'avez pas cliqué sur « Enregistrer les postes ». Les groupes spéciaux
+            (Revenus, Épargne, Remises) gardent leur comportement particulier tant que leur nom exact n'est pas modifié.
+        </TextBlock>
+
+        <ItemsControl ItemsSource="{Binding Groupes}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type adm:GroupeEditionViewModel}">
+                    <Border BorderBrush="{StaticResource BrosseBordure}" BorderThickness="1" CornerRadius="4"
+                            Padding="12" Margin="0,0,0,10">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,10">
+                                <TextBox Text="{Binding Nom, UpdateSourceTrigger=PropertyChanged}" FontWeight="SemiBold"
+                                         DockPanel.Dock="Left" Width="260" Margin="0,0,8,0" />
+                                <Button DockPanel.Dock="Right" Content="Supprimer le groupe" HorizontalAlignment="Right"
+                                        Style="{StaticResource StyleBoutonDanger}" Padding="8,4"
+                                        Command="{Binding DataContext.SupprimerGroupeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}" />
+                            </DockPanel>
+
+                            <ItemsControl ItemsSource="{Binding Postes}" Margin="16,0,0,8">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type adm:PosteEditionViewModel}">
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="300" />
+                                                <ColumnDefinition Width="28" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox Grid.Column="0" Text="{Binding Nom, UpdateSourceTrigger=PropertyChanged}" />
+                                            <Button Grid.Column="1" Content="✕" ToolTip="Retirer ce poste"
+                                                    Command="{Binding DataContext.SupprimerPosteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Button Content="+ Ajouter un poste" HorizontalAlignment="Left" Padding="8,4" Margin="16,0,0,0"
+                                    Command="{Binding AjouterPosteCommand}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Button Content="Enregistrer les postes" Command="{Binding EnregistrerPostesCommand}"
+                Padding="12,6" HorizontalAlignment="Left" Margin="0,8,0,0" />
+
+    </StackPanel>
+    </ScrollViewer>
+</UserControl>
