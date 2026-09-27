@@ -1,25 +1,29 @@
-﻿alxBudgetDesktop — Gérez votre budget personnel simplement
+﻿Fluxo — Gérez votre budget personnel simplement
 =============================================================
 
 QU'EST-CE QUE C'EST ?
 ----------------------
-alxBudgetDesktop est une application de bureau Windows pour suivre vos
-dépenses et vos recettes au quotidien : combien vous dépensez, dans
-quelles catégories, et ce qu'il vous reste. Tout reste sur votre
-ordinateur — aucune connexion internet requise, aucun compte à créer,
-aucune donnée envoyée nulle part.
+Fluxo est une application de bureau Windows pour suivre vos dépenses et
+vos recettes au quotidien : combien vous dépensez, dans quelles
+catégories, et ce qu'il vous reste. Tout reste sur votre ordinateur —
+aucune connexion internet requise, aucun compte à créer, aucune donnée
+envoyée nulle part.
+
+Fluxo s'appelait à l'origine alxBudgetDesktop : le port en application de
+bureau (WPF/.NET) d'alxBudget, une application web (React/TypeScript) plus
+ancienne du même auteur, pour le même besoin.
 
 
 INSTALLATION
 ------------
 1. Dézippez ce dossier où vous voulez (Bureau, Documents...). Gardez
    tous les fichiers ensemble dans le même dossier, ne déplacez pas
-   AlxBudgetDesktop.App.exe tout seul.
-2. Double-cliquez sur AlxBudgetDesktop.App.exe pour lancer
-   l'application. Aucune installation supplémentaire n'est nécessaire.
-3. (Facultatif) Clic droit sur AlxBudgetDesktop.App.exe puis
-   "Créer un raccourci", et placez ce raccourci sur votre Bureau ou
-   épinglez-le à votre barre des tâches pour y accéder plus vite.
+   Fluxo.exe tout seul.
+2. Double-cliquez sur Fluxo.exe pour lancer l'application. Aucune
+   installation supplémentaire n'est nécessaire.
+3. (Facultatif) Clic droit sur Fluxo.exe puis "Créer un raccourci", et
+   placez ce raccourci sur votre Bureau ou épinglez-le à votre barre des
+   tâches pour y accéder plus vite.
 
 Pour désinstaller : supprimez simplement ce dossier. Vos données sont
 stockées ailleurs (voir plus bas), elles ne sont pas effacées avec.
@@ -47,8 +51,32 @@ PREMIERS PAS
   par votre banque, si vos saisies ont pris du retard.
 
 - CONTRÔLE BANCAIRE : le bouton "Contrôler avec un relevé" compare vos
-  saisies à un relevé bancaire (fichier CSV téléchargé depuis le site
-  de votre banque) pour repérer ce qui manque des deux côtés.
+  saisies à un relevé bancaire — un export CSV téléchargé depuis le
+  site de votre banque, ou un fichier xlsx (si vous faites extraire vos
+  relevés PDF autrement, voir docs/prompt-extraction-releve-cic.md) —
+  pour repérer ce qui manque des deux côtés :
+    - "à saisir" : une opération présente sur le relevé mais jamais
+      saisie dans l'appli — cliquez dessus pour l'ajouter directement,
+      champs déjà pré-remplis.
+    - "orpheline" : l'inverse, une opération saisie chez vous qui ne se
+      retrouve sur aucun relevé importé — à vérifier (montant, date,
+      ou peut-être payée autrement qu'avec ce compte).
+  Un rapprochement réussi est mémorisé définitivement : vous pouvez
+  contrôler un même mois plusieurs fois, avec plusieurs relevés
+  successifs, sans jamais perdre ce qui a déjà été validé. En cas
+  d'erreur (mauvais fichier importé par mégarde...), le bouton
+  "Réinitialiser le contrôle" remet ce mois à zéro sans supprimer vos
+  opérations.
+
+  ATTENTION AU PIÈGE DU 1er DU MOIS : un relevé bancaire est daté du
+  jour où la banque l'a édité, pas du mois qu'il couvre réellement. Un
+  relevé "au 01/08" contient en réalité l'essentiel de JUILLET, pas
+  août ! Et une carte utilisée le 31/07 peut n'être débitée que le
+  03/08 par la banque — cette opération n'apparaîtra alors que sur le
+  relevé SUIVANT. Conséquence pratique : un mois demande souvent 2
+  relevés successifs (parfois 3) pour arriver à zéro écart. Ce n'est
+  pas une erreur si "Valider ce mois" n'apparaît pas tout de suite —
+  importez le relevé suivant.
 
 - VALIDER UN MOIS : une fois un mois sans écart au contrôle, le
   bouton "Valider ce mois" le marque comme bouclé — une pastille
@@ -66,7 +94,7 @@ OÙ SONT MES DONNÉES ?
 Vos données (uniquement du texte, jamais envoyées nulle part) sont
 stockées automatiquement dans ce dossier :
 
-    %LOCALAPPDATA%\alxBudgetDesktop\
+    %LOCALAPPDATA%\Fluxo\
 
 Astuce : collez ce chemin (avec les %) dans la barre d'adresse de
 l'Explorateur Windows pour y accéder directement. C'est ce dossier

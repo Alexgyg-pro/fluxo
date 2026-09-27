@@ -7,17 +7,64 @@
 
 ## En cours
 
+### US-010 — Afficher les relevés déjà pris en compte pour un mois
+**En tant qu'**utilisateur, **je veux** voir quelque part quels relevés (fichiers) ont déjà été importés pour contrôler un mois donné
+**afin de** ne pas avoir à me souvenir moi-même de ceux déjà utilisés, surtout quand un mois nécessite plusieurs relevés successifs (US-008) et que leur période réelle ne correspond pas à leur nom de fichier.
+
+**Contexte :** Remarque du PO en testant US-008 sur juillet 2026 (qui a demandé deux relevés successifs pour être complètement rapproché). Rien dans l'appli ne garde trace de quels fichiers ont déjà été importés pour un mois — seul l'état cumulé (rapproché/pas rapproché) est visible, pas l'historique des imports eux-mêmes.
+
+**Pistes à trancher à la reprise :**
+- Où l'afficher : dans le bandeau de contrôle (à côté du résumé "X orpheline(s), Y à saisir"), ou dans un historique consultable à part ?
+- Que mémoriser exactement : juste le nom du fichier importé (simple, mais perd le contexte si le fichier est renommé/déplacé), ou aussi sa période réelle détectée (min/max des dates de ses lignes) pour lever l'ambiguïté du nommage CIC (le nom du fichier ne correspond pas à sa période de couverture, cf. US-005/US-008) ?
+- Persistant (survit à la fermeture de l'appli, utile puisqu'un mois peut être contrôlé sur plusieurs sessions) ou juste pour la session en cours ?
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Décision PO sur l'emplacement et le contenu affiché.
+- [ ] L'historique des relevés importés pour un mois est visible et persiste entre les sessions.
+
+---
+
+### US-008 — Rapprochement persisté, cumulable sur plusieurs relevés
+**En tant qu'**utilisateur, **je veux** que chaque achat rapproché avec succès soit marqué comme tel de façon durable, pour pouvoir contrôler un mois en plusieurs fois avec plusieurs relevés successifs
+**afin de** pouvoir valider un mois même quand ses dernières opérations n'apparaissent que sur le relevé du mois suivant (les cycles bancaires ne suivent pas le calendrier), sans avoir à me souvenir d'une astuce d'usage.
+
+**Contexte :** Le contrôle actuel ("Contrôler avec un relevé") est entièrement éphémère : chaque clic recalcule tout à partir de zéro et **remplace** le résultat précédent, sans rien mémoriser. Or un mois donné peut légitimement avoir des opérations de fin de mois qui n'apparaissent que sur le relevé du mois suivant (ex. un paiement carte du 31/07 encaissé le 03/08, donc visible seulement sur le relevé « suivant »). Avec un seul relevé à la fois, impossible d'obtenir zéro écart pour un tel mois — et « Valider ce mois » exige zéro écart. Découvert en creusant une question du PO sur ce point précis.
+
+**Bonne surprise en creusant le code existant :** le modèle a déjà tout ce qu'il faut, jamais branché à l'écran :
+- `Achat.Rapproche` (bool, persisté) et `Achat.DatePrelevement`/`LibelleReleve` (remplis au rapprochement) existent déjà dans `Achat.cs`.
+- `ReconciliationService.Rapprocher` exclut déjà les achats `Rapproche == true` de la recherche de candidats (`achatsCourant.Where(a => !a.Rapproche)`) — donc un deuxième contrôle avec un autre relevé ne recherche déjà, mécaniquement, que les achats pas encore rapprochés.
+- `AchatsRepository.AppliquerRapprochements(annee, matches)` existe déjà, complet, prêt à marquer `Rapproche=true` et à compléter `DatePrelevement`/`RaisonSociale`/`LibelleReleve` à partir des matches — **mais n'est appelée nulle part**.
+
+**Décisions PO (livrées) :**
+- Persistance automatique à chaque analyse (import initial *et* réanalyse silencieuse après ajout/modif/suppression), sans étape de confirmation séparée — cohérent avec la volonté du PO de garder l'appli intuitive, rien à retenir.
+- `PeutValider` **inchangé dans son code** (`AControle && ControleSansEcart && !EstValide`) : grâce au filtre déjà présent dans `ReconciliationService` (achats `Rapproche==true` exclus des candidats), un contrôle successif ne recherche mécaniquement plus que ce qui reste, et `ControleSansEcart` reflète alors correctement l'état cumulé — aucune redéfinition nécessaire.
+- Nouvelle action « Réinitialiser le contrôle de ce mois » (`MoisViewModel.ReinitialiserControleCommand`, nouvelle méthode `AchatsRepository.ReinitialiserRapprochement`) : remet `Rapproche=false` sur les achats courant/dépenses du mois affiché, et efface l'état éphémère en mémoire (sinon une réanalyse automatique re-rapprocherait aussitôt les mêmes achats avec le relevé encore en mémoire). Confirmation via une nouvelle modale générique `ConfirmActionModalViewModel` (réutilisable pour d'autres confirmations futures).
+- Documentation mise à jour (`MoisViewModel.cs`) : le contrôle n'est plus décrit comme « éphémère » — seules les lignes « à saisir » le restent par nature (ce ne sont pas des objets persistants).
+
+**Conditions de réussite :**
+- [x] `AppliquerRapprochements` appelée depuis `AnalyserControle()`.
+- [x] `PeutValider` fonctionne correctement sur plusieurs relevés successifs couvrant un mois à cheval sur deux cycles bancaires (aucun changement de code nécessaire, comportement déjà correct par construction).
+- [x] Action de réinitialisation du contrôle d'un mois, avec confirmation.
+- [x] Testé sur le cas réel de juillet 2026 (copie isolée des vraies données, jamais l'original) : contrôle avec `Releve_CIC_2026-08-03.xlsx` puis `Releve_CIC_2026-09-01.xlsx` → 65/65 achats courant de juillet rapprochés, y compris les 2 cas limites de fin de mois identifiés précédemment.
+- [ ] Testé par le PO directement dans l'application (pas seulement en simulation).
+
+---
+
 ### US-006 — Ouvrir le sélecteur de fichier sur le dossier des relevés
 **En tant qu'**utilisateur, **je veux** que le sélecteur de fichier de « Contrôler avec un relevé » s'ouvre directement sur le dossier où atterrissent mes xlsx extraits
 **afin de** ne pas avoir à naviguer manuellement jusqu'au bon dossier à chaque import mensuel.
 
-**Contexte :** Remarque du PO pendant le test de US-005. Petite amélioration de confort, pas bloquante — à faire quand l'occasion se présente.
+**Contexte :** Bug remonté par le PO : le sélecteur pointait par défaut sur un chemin de développement (repo `sample-data\`), pas pertinent en usage réel — chaque utilisateur range ses relevés où il veut, impossible de deviner un chemin figé.
 
-**Piste à trancher à la reprise :** quel dossier par défaut (`InitialDirectory` du `OpenFileDialog` dans `MoisViewModel.Controler()`) — le dossier Téléchargements de l'utilisateur (`Environment.SpecialFolder.UserProfile` + `Downloads`, en tenant compte de la redirection OneDrive déjà observée sur cette machine), ou un dossier dédié à configurer ? Mémoriser aussi le dernier dossier utilisé serait plus robuste qu'un chemin figé.
+**Décisions PO (livrées) :**
+- Dossier par défaut au tout premier usage : dossier Documents de l'utilisateur (`Environment.SpecialFolder.MyDocuments`).
+- Ensuite, mémorisation automatique du dernier dossier utilisé (`PreferencesRepository`, nouveau `preferences.json`, même esprit que `fenetre.json` pour la fenêtre) — pas de champ de configuration séparé à remplir : le PO « définit son emplacement » simplement en y naviguant une première fois (ex. `D:\Alejandro\Mes Documents\Fichiers de travail\Administration\Banque\Relevés`), l'appli s'en souvient ensuite.
+- `MoisViewModel` reçoit désormais `PreferencesRepository` en plus des autres repositories (fil de construction mis à jour : `App.xaml.cs` → `MainWindowViewModel` → `MoisViewModel`).
 
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Décision PO sur le dossier par défaut (ou mémorisation du dernier dossier utilisé).
-- [ ] Le sélecteur s'ouvre sur ce dossier au lieu du dossier par défaut de Windows.
+**Conditions de réussite :**
+- [x] Décision PO sur le dossier par défaut (Documents) et la mémorisation (dernier dossier utilisé).
+- [x] Le sélecteur s'ouvre sur ce dossier au lieu du dossier par défaut de Windows.
+- [ ] Testé par le PO dans l'appli (le dossier choisi la fois précédente est bien réutilisé).
 
 ---
 
