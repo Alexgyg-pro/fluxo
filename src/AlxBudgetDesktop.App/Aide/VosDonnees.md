@@ -15,4 +15,4 @@ C'est ce dossier qu'il faut copier si vous voulez :
 
 ## Désinstaller l'application
 
-Supprimer le dossier de l'application (celui contenant `AlxBudgetDesktop.App.exe`) n'efface pas vos données : elles vivent ailleurs, dans le dossier ci-dessus.
+Supprimer le dossier de l'application (celui contenant `Fluxo.exe`) n'efface pas vos données : elles vivent ailleurs, dans le dossier ci-dessus.

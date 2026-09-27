@@ -1,25 +1,29 @@
-﻿alxBudgetDesktop — Gérez votre budget personnel simplement
+﻿Fluxo — Gérez votre budget personnel simplement
 =============================================================
 
 QU'EST-CE QUE C'EST ?
 ----------------------
-alxBudgetDesktop est une application de bureau Windows pour suivre vos
-dépenses et vos recettes au quotidien : combien vous dépensez, dans
-quelles catégories, et ce qu'il vous reste. Tout reste sur votre
-ordinateur — aucune connexion internet requise, aucun compte à créer,
-aucune donnée envoyée nulle part.
+Fluxo est une application de bureau Windows pour suivre vos dépenses et
+vos recettes au quotidien : combien vous dépensez, dans quelles
+catégories, et ce qu'il vous reste. Tout reste sur votre ordinateur —
+aucune connexion internet requise, aucun compte à créer, aucune donnée
+envoyée nulle part.
+
+Fluxo s'appelait à l'origine alxBudgetDesktop : le port en application de
+bureau (WPF/.NET) d'alxBudget, une application web (React/TypeScript) plus
+ancienne du même auteur, pour le même besoin.
 
 
 INSTALLATION
 ------------
 1. Dézippez ce dossier où vous voulez (Bureau, Documents...). Gardez
    tous les fichiers ensemble dans le même dossier, ne déplacez pas
-   AlxBudgetDesktop.App.exe tout seul.
-2. Double-cliquez sur AlxBudgetDesktop.App.exe pour lancer
-   l'application. Aucune installation supplémentaire n'est nécessaire.
-3. (Facultatif) Clic droit sur AlxBudgetDesktop.App.exe puis
-   "Créer un raccourci", et placez ce raccourci sur votre Bureau ou
-   épinglez-le à votre barre des tâches pour y accéder plus vite.
+   Fluxo.exe tout seul.
+2. Double-cliquez sur Fluxo.exe pour lancer l'application. Aucune
+   installation supplémentaire n'est nécessaire.
+3. (Facultatif) Clic droit sur Fluxo.exe puis "Créer un raccourci", et
+   placez ce raccourci sur votre Bureau ou épinglez-le à votre barre des
+   tâches pour y accéder plus vite.
 
 Pour désinstaller : supprimez simplement ce dossier. Vos données sont
 stockées ailleurs (voir plus bas), elles ne sont pas effacées avec.

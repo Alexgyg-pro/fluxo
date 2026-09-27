@@ -1,4 +1,4 @@
-# Bienvenue dans alxBudgetDesktop
+# Bienvenue dans Fluxo
 
 Cette aide est organisée par thème dans la colonne de gauche — cliquez sur un sujet pour l'ouvrir ici.
 
