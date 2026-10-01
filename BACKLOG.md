@@ -70,8 +70,11 @@
 
 **Contexte :** Le PO pensait que le Report d'un mois ne provenait que du Disponible d'un mois **déjà validé**. Vérifié dans le code (`SoldesService.CalculerSoldesAnnee`) : c'est faux — le Report est toujours le Disponible **recalculé en direct** du mois précédent, que ce mois soit validé ou non. La validation d'un mois (US "Valider ce mois") n'a aucune influence sur l'enchaînement des soldes — c'est un simple indicateur visuel ("j'ai vérifié"), pas un verrou de calcul.
 
+**Deuxième point de confusion relevé (même sujet) :** le PO s'est aussi demandé pourquoi un mois sans correction manuelle (ex. octobre) n'affiche pas de ligne "Report" du tout. C'est normal : `MoisView.xaml` n'affiche le bloc Report/Correction/Ouverture retenue que si le mois a reçu une correction manuelle (`EstCale == true`) ; sans correction, seule une ligne "Ouverture" simple s'affiche — qui vaut de toute façon exactement le Report dans ce cas (`ouverture = calage ?? report`), l'information n'est pas perdue, juste présentée différemment.
+
 **Conditions de réussite (à affiner à la reprise) :**
 - [ ] Le thème "Soldes du mois" de l'aide précise explicitement que le Report n'exige pas que le mois précédent soit validé.
+- [ ] Le thème précise aussi pourquoi la ligne "Report" n'apparaît que sur un mois corrigé manuellement.
 
 ---
 
