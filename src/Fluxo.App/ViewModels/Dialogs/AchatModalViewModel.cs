@@ -231,7 +231,7 @@ public sealed class AchatModalViewModel : ModalViewModelBase
     }
 
     private bool PeutEnregistrer()
-        => !string.IsNullOrWhiteSpace(Etiquette) && MontantSaisi > 0 && SommeValide;
+        => !string.IsNullOrWhiteSpace(Etiquette) && MontantSaisi >= 0 && SommeValide;
 
     private void CompleterLeReste()
     {
@@ -243,7 +243,11 @@ public sealed class AchatModalViewModel : ModalViewModelBase
 
         var autresLignes = LignesPostes.Where(l => l != ligneAvide).Sum(l => l.MontantEffectif);
         var reste = MontantSaisi - autresLignes;
-        ligneAvide.MontantTexte = Arrondi.Arrondi2(reste).ToString("0.00", CultureInfo.InvariantCulture);
+        // Le champ saisi représente MontantSaisi, pas MontantEffectif : pour une ligne de
+        // remise (signe déjà inversé automatiquement, cf. LignePosteViewModel.MontantEffectif),
+        // il faut réinverser le reste pour ne pas appliquer le signe négatif deux fois.
+        var valeurSaisie = ligneAvide.EstRemise ? -reste : reste;
+        ligneAvide.MontantTexte = Arrondi.Arrondi2(valeurSaisie).ToString("0.00", CultureInfo.InvariantCulture);
     }
 
     private void Enregistrer()
