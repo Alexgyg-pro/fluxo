@@ -18,6 +18,12 @@ Exemple : un article à 4,25€ payé entièrement avec 4,25€ de cagnotte Carr
 
 Le bouton **Compléter le reste** (quand il existe une ligne de poste vide) calcule automatiquement ce qu'il faut y mettre pour que la somme retombe juste, y compris sur une ligne de remise.
 
+## Exclure une opération ponctuelle de la projection budgétaire
+
+La case **"Ne pas projeter cette opération sur les mois suivants"** sert pour une dépense ou une recette ponctuelle importante mais non récurrente (ex. impôts, 1 200€) : sans elle, l'onglet Budget moyennerait cette somme dans tous les mois futurs projetés, ce qui n'a pas de sens pour une opération qui ne se reproduit pas chaque mois.
+
+Cochée, l'opération continue de s'afficher normalement dans son propre mois (totaux réels inchangés) — elle est seulement ignorée dans le calcul de la moyenne qui alimente la projection des mois à venir.
+
 ## Répartir un montant sur plusieurs postes
 
 Utile par exemple pour un retrait d'argent liquide dont une partie sert à quelque chose de précis que vous voulez suivre (l'argent de poche d'un enfant, un rendez-vous chez le coiffeur...) et le reste à des dépenses du quotidien non détaillées : une seule ligne de retrait, répartie en deux postes, plutôt que de créer une dépense séparée pour chaque petit achat en liquide.

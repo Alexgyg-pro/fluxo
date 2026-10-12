@@ -50,6 +50,7 @@ public sealed partial class AchatsRepository(DataPathProvider chemins, JsonFileS
             Compte = input.Compte,
             Postes = input.Postes,
             LibelleReleve = input.LibelleReleve,
+            ExclureProjection = input.ExclureProjection,
         };
 
         var annee = input.DateAchat.Year;
@@ -88,6 +89,7 @@ public sealed partial class AchatsRepository(DataPathProvider chemins, JsonFileS
             Compte = input.Compte,
             Postes = input.Postes,
             LibelleReleve = input.LibelleReleve,
+            ExclureProjection = input.ExclureProjection,
         };
 
         achats[index] = modifie;
@@ -135,6 +137,7 @@ public sealed partial class AchatsRepository(DataPathProvider chemins, JsonFileS
                 Compte = a.Compte,
                 Postes = a.Postes,
                 LibelleReleve = ligne.LibelleBrut,
+                ExclureProjection = a.ExclureProjection,
             };
         }
 
@@ -169,6 +172,7 @@ public sealed partial class AchatsRepository(DataPathProvider chemins, JsonFileS
                 Compte = a.Compte,
                 Postes = a.Postes,
                 LibelleReleve = a.LibelleReleve,
+                ExclureProjection = a.ExclureProjection,
             };
         }
 

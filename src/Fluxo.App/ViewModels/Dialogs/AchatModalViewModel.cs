@@ -100,6 +100,17 @@ public sealed class AchatModalViewModel : ModalViewModelBase
         set => SetProperty(ref _raisonSociale, value);
     }
 
+    private bool _exclureProjection;
+    /// <summary>Case "Ne pas projeter cette opération" : une dépense ou recette ponctuelle
+    /// importante (ex. impôts) continue de s'afficher normalement dans son mois réel, mais
+    /// n'entre pas dans le calcul de la moyenne qui alimente la projection des mois suivants
+    /// (cf. BudgetService.CalculerBudget).</summary>
+    public bool ExclureProjection
+    {
+        get => _exclureProjection;
+        set => SetProperty(ref _exclureProjection, value);
+    }
+
     private string? _messageErreur;
     public string? MessageErreur
     {
@@ -193,6 +204,7 @@ public sealed class AchatModalViewModel : ModalViewModelBase
             _compte = achatExistant.Compte;
             _datePrelevementTexte = achatExistant.DatePrelevement?.ToString("yyyy-MM-dd") ?? "";
             _raisonSociale = achatExistant.RaisonSociale;
+            _exclureProjection = achatExistant.ExclureProjection;
 
             foreach (var (poste, montant) in achatExistant.Postes)
             {
@@ -268,6 +280,7 @@ public sealed class AchatModalViewModel : ModalViewModelBase
             Compte = Mode == ModeAchat.Recette ? Compte.Courant : Compte,
             Postes = postes,
             LibelleReleve = _achatExistant?.LibelleReleve ?? _libelleRelevePrefill,
+            ExclureProjection = ExclureProjection,
         };
 
         var erreurs = AchatValidator.Valider(input);

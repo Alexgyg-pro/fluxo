@@ -31,9 +31,14 @@
 
 **Précision importante :** l'exclusion ne doit jouer que sur le **calcul de la moyenne servant à la projection** des mois futurs — le mois où la dépense a réellement eu lieu doit continuer à l'afficher normalement dans ses totaux réels.
 
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Nouveau champ sur `Achat` (ex. `ExclureProjection`), case à cocher dans la modale de saisie.
-- [ ] `BudgetService` : les opérations marquées sont ignorées dans le calcul de la moyenne des mois clos renseignés, mais toujours comptées dans les totaux réels de leur propre mois.
+**Décisions (livrées) :**
+- Nouveau champ `ExclureProjection` (bool) sur `Achat`/`AchatInput`, ajouté en fin de liste de propriétés pour ne pas perturber l'ordre historique des champs portés d'alxBudget (qui ne connaît pas cette notion) — défaut `false` pour tous les achats existants sans migration nécessaire.
+- `BudgetService.CalculerBudget` : deux accumulateurs distincts par poste — l'un (toutes opérations) alimente les totaux réels affichés, l'autre (opérations non exclues seulement) alimente le calcul de la moyenne de projection. Un mois dont la seule opération est exclue ne compte pas non plus dans le dénominateur de cette moyenne.
+- Case à cocher "Ne pas projeter cette opération sur les mois suivants" dans la modale de saisie (dépense et recette), avec info-bulle explicative ; documentée dans l'aide (thème "Saisir une opération").
+
+**Conditions de réussite :**
+- [x] Nouveau champ sur `Achat` (`ExclureProjection`), case à cocher dans la modale de saisie.
+- [x] `BudgetService` : les opérations marquées sont ignorées dans le calcul de la moyenne des mois clos renseignés, mais toujours comptées dans les totaux réels de leur propre mois. Vérifié par 2 nouveaux tests automatisés (exclusion simple, et mois dont la seule opération est exclue).
 - [ ] Testé sur un cas réel (une dépense annuelle type impôts).
 
 ---

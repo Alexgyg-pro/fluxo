@@ -42,6 +42,14 @@ public sealed class Achat
     [JsonPropertyName("libelleReleve")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? LibelleReleve { get; init; }
+
+    /// <summary>Champ propre à Fluxo, absent du format alxBudget d'origine — placé en
+    /// dernier pour ne pas perturber l'ordre des champs historiques. Une opération
+    /// ponctuelle importante (ex. impôts) marquée ainsi continue de s'afficher
+    /// normalement dans son propre mois, mais n'entre pas dans le calcul de la moyenne
+    /// qui alimente la projection des mois futurs (cf. BudgetService).</summary>
+    [JsonPropertyName("exclureProjection")]
+    public bool ExclureProjection { get; init; }
 }
 
 /// <summary>
@@ -58,4 +66,5 @@ public sealed class AchatInput
     public required Compte Compte { get; init; }
     public required Dictionary<string, decimal> Postes { get; init; }
     public string? LibelleReleve { get; init; }
+    public bool ExclureProjection { get; init; }
 }

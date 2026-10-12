@@ -38,8 +38,15 @@ public static class BudgetService
         var moisClos = CalculerMoisClos(annee, today).ToHashSet();
         var moisProjetes = Enumerable.Range(0, 12).Where(m => typesMois[m] == TypeMois.Projete).ToList();
 
+        // reelParPoste sert aux totaux réels affichés : toutes les opérations y comptent,
+        // y compris celles marquées ExclureProjection. reelProjetableParPoste et
+        // moisRenseignesProjetablesParPoste n'alimentent que le calcul de la moyenne de
+        // projection : une opération ponctuelle exclue (ex. impôts) ne doit pas fausser
+        // la projection des mois suivants, même si elle continue de s'afficher normalement
+        // dans le mois où elle a réellement eu lieu.
         var reelParPoste = new Dictionary<string, decimal[]>();
-        var moisRenseignesParPoste = new Dictionary<string, HashSet<int>>();
+        var reelProjetableParPoste = new Dictionary<string, decimal[]>();
+        var moisRenseignesProjetablesParPoste = new Dictionary<string, HashSet<int>>();
 
         foreach (var achat in achatsAnnee)
         {
@@ -53,10 +60,22 @@ public static class BudgetService
                 }
                 mensuel[mois] += montant;
 
-                if (!moisRenseignesParPoste.TryGetValue(poste, out var moisRenseignes))
+                if (achat.ExclureProjection)
+                {
+                    continue;
+                }
+
+                if (!reelProjetableParPoste.TryGetValue(poste, out var mensuelProjetable))
+                {
+                    mensuelProjetable = new decimal[12];
+                    reelProjetableParPoste[poste] = mensuelProjetable;
+                }
+                mensuelProjetable[mois] += montant;
+
+                if (!moisRenseignesProjetablesParPoste.TryGetValue(poste, out var moisRenseignes))
                 {
                     moisRenseignes = new HashSet<int>();
-                    moisRenseignesParPoste[poste] = moisRenseignes;
+                    moisRenseignesProjetablesParPoste[poste] = moisRenseignes;
                 }
                 moisRenseignes.Add(mois);
             }
@@ -65,13 +84,14 @@ public static class BudgetService
         LigneBudget LigneBudgetDe(string poste)
         {
             var reel = reelParPoste.TryGetValue(poste, out var r) ? r : new decimal[12];
-            var moisRenseignes = moisRenseignesParPoste.TryGetValue(poste, out var mr) ? mr : new HashSet<int>();
+            var reelProjetable = reelProjetableParPoste.TryGetValue(poste, out var rp) ? rp : new decimal[12];
+            var moisRenseignes = moisRenseignesProjetablesParPoste.TryGetValue(poste, out var mr) ? mr : new HashSet<int>();
             var mensuel = reel.Select(Arrondi.Arrondi2).ToArray();
 
             var moisClosRenseignes = moisClos.Intersect(moisRenseignes).ToList();
             if (moisClosRenseignes.Count > 0 && moisProjetes.Count > 0)
             {
-                var moyenne = Arrondi.Arrondi2(SommeArrondie(moisClosRenseignes.Select(m => reel[m])) / moisClosRenseignes.Count);
+                var moyenne = Arrondi.Arrondi2(SommeArrondie(moisClosRenseignes.Select(m => reelProjetable[m])) / moisClosRenseignes.Count);
                 foreach (var m in moisProjetes)
                 {
                     mensuel[m] = moyenne;
