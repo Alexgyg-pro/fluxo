@@ -160,6 +160,48 @@
 
 ---
 
+## Corrigé
+
+> Bugs remontés par l'usage réel, corrigés directement (pas de passage par "En cours" :
+> contrairement aux US, un bug ne demande pas de validation d'approche par le PO avant codage).
+
+### BUG-003 — Modale "Ajouter une dépense" : bouton Enregistrer désactivé et signe inversé sur les cagnottes
+**Symptôme :** pour un achat entièrement couvert par une cagnotte (ex. Carrefour, montant net 0€),
+le bouton Enregistrer restait désactivé même avec la somme des postes valide (`PeutEnregistrer`
+exigeait encore `MontantSaisi > 0`, incohérent avec `BUG-002` ci-dessous qui autorise désormais un
+montant nul). Par ailleurs, cliquer sur "Compléter le reste" pour remplir automatiquement la ligne
+de remise (ex. "Cagnotte fidélité") appliquait le signe négatif deux fois : le reste algébrique brut
+était écrit dans le champ saisi sans tenir compte de l'inversion de signe déjà automatique sur une
+ligne de remise (`LignePosteViewModel.MontantEffectif`), faisant diverger la somme affichée.
+
+**Correctif :** `PeutEnregistrer` accepte `MontantSaisi >= 0` ; `CompleterLeReste` réinverse le reste
+avant de l'écrire quand la ligne cible est une remise (`EstRemise`).
+
+**Corrigé le :** 2026-10-12.
+
+### BUG-002 — Achat entièrement couvert par une cagnotte impossible à enregistrer
+**Symptôme :** `AchatValidator` rejetait tout montant `<= 0`, alors qu'un achat réellement débité à
+0€ (totalement compensé par une cagnotte fidélité) est un cas valide.
+
+**Correctif :** seul un montant strictement négatif est désormais rejeté (`< 0`).
+
+**Corrigé le :** 2026-10-12.
+
+### BUG-001 — Pré-remplissage de date et flag "orpheline" obsolète dans le contrôle de rapprochement
+**Symptôme :** deux problèmes distincts remontés ensemble par le PO. (1) En cliquant sur une ligne
+"à saisir" du contrôle de rapprochement pour ouvrir la modale d'ajout, la date pré-remplie restait
+au 1er du mois au lieu de reprendre la date déjà connue de la ligne de relevé (`AchatPrefill`
+n'était jamais reporté sur `DateAchat`). (2) En contrôlant un même mois avec plusieurs relevés
+successifs, un achat marqué "orpheline" au premier passage gardait ce marqueur même une fois
+rapproché par un relevé suivant : le statut n'était jamais réévalué à `false`, seulement mis à `true`.
+
+**Correctif :** `AchatModalViewModel` reporte `prefill.DatePrelevement` sur `DateAchat` ; `MoisViewModel.AnalyserControle`
+recalcule `EstOrpheline` pour chaque achat à chaque passage, au lieu de ne jamais le réinitialiser.
+
+**Corrigé le :** 2026-10-12.
+
+---
+
 ## Terminé
 
 ### US-007 — Aide utilisateur accessible depuis l'application
