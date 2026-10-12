@@ -7,7 +7,7 @@ namespace Fluxo.Domain.Tests;
 
 public class BudgetServiceTests
 {
-    private static Achat Depense(string poste, decimal montant, DateOnly dateAchat)
+    private static Achat Depense(string poste, decimal montant, DateOnly dateAchat, bool exclureProjection = false)
         => new()
         {
             Id = Guid.NewGuid(),
@@ -16,6 +16,7 @@ public class BudgetServiceTests
             MontantAchat = montant,
             Compte = Compte.Courant,
             Postes = new Dictionary<string, decimal> { [poste] = montant },
+            ExclureProjection = exclureProjection,
         };
 
     private static readonly List<GroupePostes> Groupes =
@@ -94,6 +95,45 @@ public class BudgetServiceTests
         var budget = BudgetService.CalculerBudget(2025, achats, achats, Groupes, aujourdhui);
 
         Assert.Equal(1700m, budget.SoldeMensuel[5]); // juin, index 5
+    }
+
+    [Fact]
+    public void Operation_exclue_de_la_projection_napparait_pas_dans_la_moyenne_mais_reste_dans_son_mois_reel()
+    {
+        // Mars (impôts, 1200€, exclue) et deux mois normaux à 100€ (fev, avr) renseignés,
+        // tous clos avant juin. Si l'exclusion ne fonctionnait pas, la moyenne inclurait les
+        // 1200€ et gonflerait artificiellement la projection des mois suivants.
+        var aujourdhui = new DateOnly(2025, 6, 1);
+        var achats = new List<Achat>
+        {
+            Depense("Courses", 100m, new DateOnly(2025, 2, 1)),
+            Depense("Courses", 1200m, new DateOnly(2025, 3, 15), exclureProjection: true),
+            Depense("Courses", 100m, new DateOnly(2025, 4, 1)),
+        };
+
+        var budget = BudgetService.CalculerBudget(2025, achats, achats, Groupes, aujourdhui);
+
+        var ligneCourses = budget.Groupes.Single(g => g.Nom == "Alimentation").Lignes.Single(l => l.Poste == "Courses");
+        Assert.Equal(1200m, ligneCourses.Mensuel[2]); // mars : affiché normalement dans son propre mois
+        Assert.Equal(100m, ligneCourses.Mensuel[6]);  // juillet, mois projeté : moyenne de fev/avr seulement
+    }
+
+    [Fact]
+    public void Mois_dont_la_seule_operation_est_exclue_ne_compte_pas_dans_le_denominateur_de_la_moyenne()
+    {
+        // Mars (seule opération du poste ce mois-là) est exclue : le mois ne doit pas compter
+        // comme "renseigné" pour la moyenne, sous peine de diviser par un mois à tort inclus.
+        var aujourdhui = new DateOnly(2025, 5, 1);
+        var achats = new List<Achat>
+        {
+            Depense("Courses", 1200m, new DateOnly(2025, 3, 15), exclureProjection: true),
+            Depense("Courses", 80m, new DateOnly(2025, 4, 1)),
+        };
+
+        var budget = BudgetService.CalculerBudget(2025, achats, achats, Groupes, aujourdhui);
+
+        var ligneCourses = budget.Groupes.Single(g => g.Nom == "Alimentation").Lignes.Single(l => l.Poste == "Courses");
+        Assert.Equal(80m, ligneCourses.Mensuel[5]); // juin, mois projeté : moyenne d'avril seul (80€), pas (1200+80)/2
     }
 
     [Fact]
