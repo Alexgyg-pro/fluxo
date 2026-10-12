@@ -208,6 +208,7 @@ public sealed class AchatModalViewModel : ModalViewModelBase
 
             if (prefill is not null)
             {
+                _dateAchat = prefill.DatePrelevement;
                 _montantTexte = prefill.Montant.ToString("0.00", CultureInfo.InvariantCulture);
                 _etiquette = prefill.Etiquette;
                 _datePrelevementTexte = prefill.DatePrelevement.ToString("yyyy-MM-dd");

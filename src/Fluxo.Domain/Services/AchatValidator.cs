@@ -19,9 +19,9 @@ public static class AchatValidator
             erreurs.Add("L'étiquette est obligatoire.");
         }
 
-        if (input.MontantAchat <= 0)
+        if (input.MontantAchat < 0)
         {
-            erreurs.Add("Le montant doit être strictement positif.");
+            erreurs.Add("Le montant ne peut pas être négatif.");
         }
 
         if (input.Postes.Count == 0)
