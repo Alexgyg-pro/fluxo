@@ -31,10 +31,19 @@ public class AchatValidatorTests
     }
 
     [Fact]
-    public void Montant_negatif_ou_nul_est_rejete()
+    public void Montant_negatif_est_rejete()
     {
+        var erreurs = AchatValidator.Valider(Input(-1m, new() { ["Alimentation"] = -1m }));
+        Assert.Contains(erreurs, e => e.Contains("négatif", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Montant_nul_est_autorise()
+    {
+        // Achat entièrement couvert par une cagnotte (ex. Carrefour) : le montant réellement
+        // débité est 0€, ce qui doit rester une saisie valide.
         var erreurs = AchatValidator.Valider(Input(0m, new() { ["Alimentation"] = 0m }));
-        Assert.Contains(erreurs, e => e.Contains("strictement positif", StringComparison.OrdinalIgnoreCase));
+        Assert.Empty(erreurs);
     }
 
     [Fact]

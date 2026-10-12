@@ -409,9 +409,10 @@ public sealed class MoisViewModel : TabViewModelBase
 
         for (var i = 0; i < Achats.Count; i++)
         {
-            if (orphelinesDuMois.Contains(Achats[i].Id))
+            var estOrpheline = orphelinesDuMois.Contains(Achats[i].Id);
+            if (Achats[i].EstOrpheline != estOrpheline)
             {
-                Achats[i] = new AchatLigneViewModel(Achats[i].Achat, Achats[i].EstRecette, estOrpheline: true);
+                Achats[i] = new AchatLigneViewModel(Achats[i].Achat, Achats[i].EstRecette, estOrpheline);
             }
         }
 
