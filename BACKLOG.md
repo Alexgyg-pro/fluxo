@@ -7,19 +7,6 @@
 
 ## En cours
 
-### US-015 — Inclure le prompt d'extraction de relevé dans l'aide elle-même
-**En tant qu'**utilisateur, **je veux** que le prompt standardisé d'extraction de relevé (PDF → xlsx) soit lisible directement depuis l'aide en ligne
-**afin de** pouvoir l'utiliser même en n'ayant que l'application installée, sans le dépôt de développement.
-
-**Contexte :** Le thème "Contrôle bancaire" de l'aide renvoie vers `docs/prompt-extraction-releve-cic.md` — un chemin qui n'existe que dans le dépôt Git. Une fois l'application publiée (`dotnet publish`), ce fichier n'est pas inclus dans le dossier distribué : quelqu'un n'ayant que l'exe installé (y compris le PO lui-même, sur un poste sans le dépôt cloné) ne peut pas y accéder. Repéré par le PO en relisant l'aide.
-
-**Piste à trancher à la reprise :** dupliquer le contenu du prompt directement dans un thème de l'aide (nouveau thème, ou section ajoutée à "Contrôle bancaire"), de la même manière que les autres contenus d'aide (fichier `.md` embarqué en ressource). Décider si `docs/prompt-extraction-releve-cic.md` reste la source de vérité à copier manuellement dans l'aide, ou si l'un des deux devient inutile.
-
-**Conditions de réussite (à affiner à la reprise) :**
-- [ ] Le prompt est lisible intégralement depuis l'aide en ligne, sans dépendre du dépôt de développement.
-
----
-
 ### US-014 — Solde cumulé (Épargne/Tickets Restaurant) sur l'année en cours uniquement
 **En tant qu'**utilisateur, **je veux** que les soldes d'épargne et de tickets restaurant affichés dans l'onglet Budget ne portent que sur l'année en cours
 **afin de** avoir une vision plus directement utile, plutôt qu'un cumul sur tout l'historique.
@@ -203,6 +190,21 @@ recalcule `EstOrpheline` pour chaque achat à chaque passage, au lieu de ne jama
 ---
 
 ## Terminé
+
+### US-015 — Inclure le prompt d'extraction de relevé dans l'aide elle-même
+**En tant qu'**utilisateur, **je veux** que le prompt standardisé d'extraction de relevé (PDF → xlsx) soit lisible directement depuis l'aide en ligne
+**afin de** pouvoir l'utiliser même en n'ayant que l'application installée, sans le dépôt de développement.
+
+**Décisions PO (livrées) :**
+- Nouveau thème d'aide "Extraire un relevé (prompt)" (`Aide/ExtraireUnReleve.md`), copie orientée utilisateur du prompt et de sa checklist de validation, sans les références de code.
+- `docs/prompt-extraction-releve-cic.md` reste la source de vérité technique côté dépôt (références aux classes C#, destiné aux sessions de dev) — un commentaire en tête renvoie désormais explicitement vers la copie utilisateur et rappelle de répercuter manuellement tout changement dans les deux.
+- Le thème "Contrôle bancaire" renvoie maintenant vers ce nouveau thème d'aide plutôt que vers le chemin dépôt, inaccessible une fois l'appli publiée.
+- Au passage : documentation de la subtilité "achat entièrement payé avec une cagnotte" (montant 0€ autorisé, signe automatiquement inversé sur un poste de remise) ajoutée au thème "Saisir une opération".
+
+**Conditions de réussite :**
+- [x] Le prompt est lisible intégralement depuis l'aide en ligne, sans dépendre du dépôt de développement.
+
+**Livré le :** 2026-10-12.
 
 ### US-007 — Aide utilisateur accessible depuis l'application
 **En tant qu'**utilisateur, **je veux** accéder à une aide directement depuis l'application (icône « ? » à droite de l'onglet Admin dans la barre d'onglets)
