@@ -11,6 +11,13 @@ vérifier que l'import fonctionne toujours** (le nom de l'onglet et les
 en-têtes de colonnes sont comparés tels quels, insensibles à la casse/aux
 espaces mais pas au reste).
 
+**Ce fichier est la source de vérité technique** (références aux classes
+C#, destiné aux sessions de développement). Une copie orientée utilisateur
+existe dans l'aide en ligne de l'app (`src/Fluxo.App/Aide/ExtraireUnReleve.md`,
+thème "Extraire un relevé (prompt)") — sans les références de code, pour
+rester lisible hors contexte de dev. Toute modification du prompt ou de la
+checklist de validation doit être répercutée manuellement dans les deux.
+
 ---
 
 ## Prompt à copier-coller

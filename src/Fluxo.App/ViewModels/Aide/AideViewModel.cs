@@ -19,6 +19,7 @@ public sealed class AideViewModel : ObservableObject
         new("Saisir une opération", "SaisirUneOperation.md"),
         new("Soldes du mois", "SoldesDuMois.md"),
         new("Contrôle bancaire", "ControleBancaire.md"),
+        new("Extraire un relevé (prompt)", "ExtraireUnReleve.md"),
         new("Valider un mois", "ValiderUnMois.md"),
         new("Gérer vos postes", "GererVosPostes.md"),
         new("Onglet Budget", "Budget.md"),

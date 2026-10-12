@@ -7,6 +7,69 @@
 
 ## En cours
 
+### US-014 — Solde cumulé (Épargne/Tickets Restaurant) sur l'année en cours uniquement
+**En tant qu'**utilisateur, **je veux** que les soldes d'épargne et de tickets restaurant affichés dans l'onglet Budget ne portent que sur l'année en cours
+**afin de** avoir une vision plus directement utile, plutôt qu'un cumul sur tout l'historique.
+
+**Contexte :** Comportement actuel hérité fidèlement du port d'alxBudget : ces soldes sont cumulés sur **toutes** les années confondues, pas seulement l'année affichée (décision documentée à l'origine du projet). Le PO souhaite maintenant s'écarter de ce comportement d'origine — décision produit assumée, pas une fidélité à préserver à tout prix.
+
+**Impact à anticiper :** changement dans `BudgetService` (Domain) ; le thème "Onglet Budget" de l'aide en ligne (qui documente actuellement le comportement "cumulé sur tout l'historique") devra être corrigé en même temps.
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Décision PO confirmée sur le périmètre exact ("année en cours" = achats de l'année affichée uniquement).
+- [ ] `BudgetService` et l'aide en ligne mis à jour ensemble.
+
+---
+
+### US-013 — Exclure certaines opérations ponctuelles de la projection budgétaire
+**En tant qu'**utilisateur, **je veux** pouvoir marquer une dépense ou une recette comme "à ne pas projeter"
+**afin de** éviter qu'une grosse dépense annuelle (ex. impôts, 1 200 €) ne fausse la projection des mois suivants de l'onglet Budget.
+
+**Contexte :** Remarque du PO après avoir payé ses impôts : une dépense ponctuelle importante mais non récurrente mensuellement n'a pas de sens à projeter sur les mois suivants, puisque la projection actuelle moyenne les mois clos renseignés.
+
+**Décision (PO + avis Claude, alignés) :** entre deux pistes — (a) un indicateur au niveau du **poste** ("ce poste n'est jamais projeté"), ou (b) une case à cocher **à la saisie de chaque opération** ("Ne pas projeter cette dépense/recette") — la piste (b) est retenue. Plus précise : elle cible l'opération exceptionnelle elle-même, pas toute une catégorie (un poste "Impôts" pourrait très bien contenir aussi de petites régularisations qu'on voudrait, elles, projeter normalement). Une case par poste serait tout ou rien ; une case par opération colle exactement au besoin exprimé.
+
+**Précision importante :** l'exclusion ne doit jouer que sur le **calcul de la moyenne servant à la projection** des mois futurs — le mois où la dépense a réellement eu lieu doit continuer à l'afficher normalement dans ses totaux réels.
+
+**Décisions (livrées) :**
+- Nouveau champ `ExclureProjection` (bool) sur `Achat`/`AchatInput`, ajouté en fin de liste de propriétés pour ne pas perturber l'ordre historique des champs portés d'alxBudget (qui ne connaît pas cette notion) — défaut `false` pour tous les achats existants sans migration nécessaire.
+- `BudgetService.CalculerBudget` : deux accumulateurs distincts par poste — l'un (toutes opérations) alimente les totaux réels affichés, l'autre (opérations non exclues seulement) alimente le calcul de la moyenne de projection. Un mois dont la seule opération est exclue ne compte pas non plus dans le dénominateur de cette moyenne.
+- Case à cocher "Ne pas projeter cette opération sur les mois suivants" dans la modale de saisie (dépense et recette), avec info-bulle explicative ; documentée dans l'aide (thème "Saisir une opération").
+
+**Conditions de réussite :**
+- [x] Nouveau champ sur `Achat` (`ExclureProjection`), case à cocher dans la modale de saisie.
+- [x] `BudgetService` : les opérations marquées sont ignorées dans le calcul de la moyenne des mois clos renseignés, mais toujours comptées dans les totaux réels de leur propre mois. Vérifié par 2 nouveaux tests automatisés (exclusion simple, et mois dont la seule opération est exclue).
+- [ ] Testé sur un cas réel (une dépense annuelle type impôts).
+
+---
+
+### US-012 — Marge dans la fenêtre d'aide quand la barre de défilement apparaît
+**En tant qu'**utilisateur, **je veux** que le texte de l'aide ne soit pas collé à la barre de défilement verticale
+**afin de** garder une lecture confortable sur les thèmes au contenu plus long.
+
+**Contexte :** Remarque du PO : quand un thème de l'aide est assez long pour faire apparaître la barre de défilement, le texte touche directement cette barre — manque de marge à droite.
+
+**Piste à trancher à la reprise :** `AideWindow.xaml`, `FlowDocumentScrollViewer` — vérifier si son `Padding` s'applique bien à l'intérieur de la zone de défilement (pas seulement autour du contrôle, scrollbar comprise) ; sinon ajuster via le `PagePadding` du `FlowDocument` lui-même plutôt que le `Padding` du viewer.
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Le texte garde un espace visible par rapport à la barre de défilement, quel que soit le thème affiché.
+
+---
+
+### US-011 — Clarifier dans l'aide d'où vient le "Report" du solde
+**En tant qu'**utilisateur, **je veux** que l'aide explique clairement d'où vient le Report affiché en haut de chaque mois
+**afin de** ne pas me méprendre sur son fonctionnement.
+
+**Contexte :** Le PO pensait que le Report d'un mois ne provenait que du Disponible d'un mois **déjà validé**. Vérifié dans le code (`SoldesService.CalculerSoldesAnnee`) : c'est faux — le Report est toujours le Disponible **recalculé en direct** du mois précédent, que ce mois soit validé ou non. La validation d'un mois (US "Valider ce mois") n'a aucune influence sur l'enchaînement des soldes — c'est un simple indicateur visuel ("j'ai vérifié"), pas un verrou de calcul.
+
+**Deuxième point de confusion relevé (même sujet) :** le PO s'est aussi demandé pourquoi un mois sans correction manuelle (ex. octobre) n'affiche pas de ligne "Report" du tout. C'est normal : `MoisView.xaml` n'affiche le bloc Report/Correction/Ouverture retenue que si le mois a reçu une correction manuelle (`EstCale == true`) ; sans correction, seule une ligne "Ouverture" simple s'affiche — qui vaut de toute façon exactement le Report dans ce cas (`ouverture = calage ?? report`), l'information n'est pas perdue, juste présentée différemment.
+
+**Conditions de réussite (à affiner à la reprise) :**
+- [ ] Le thème "Soldes du mois" de l'aide précise explicitement que le Report n'exige pas que le mois précédent soit validé.
+- [ ] Le thème précise aussi pourquoi la ligne "Report" n'apparaît que sur un mois corrigé manuellement.
+
+---
+
 ### US-010 — Afficher les relevés déjà pris en compte pour un mois
 **En tant qu'**utilisateur, **je veux** voir quelque part quels relevés (fichiers) ont déjà été importés pour contrôler un mois donné
 **afin de** ne pas avoir à me souvenir moi-même de ceux déjà utilisés, surtout quand un mois nécessite plusieurs relevés successifs (US-008) et que leur période réelle ne correspond pas à leur nom de fichier.
@@ -89,7 +152,64 @@
 
 ---
 
+## Corrigé
+
+> Bugs remontés par l'usage réel, corrigés directement (pas de passage par "En cours" :
+> contrairement aux US, un bug ne demande pas de validation d'approche par le PO avant codage).
+
+### BUG-003 — Modale "Ajouter une dépense" : bouton Enregistrer désactivé et signe inversé sur les cagnottes
+**Symptôme :** pour un achat entièrement couvert par une cagnotte (ex. Carrefour, montant net 0€),
+le bouton Enregistrer restait désactivé même avec la somme des postes valide (`PeutEnregistrer`
+exigeait encore `MontantSaisi > 0`, incohérent avec `BUG-002` ci-dessous qui autorise désormais un
+montant nul). Par ailleurs, cliquer sur "Compléter le reste" pour remplir automatiquement la ligne
+de remise (ex. "Cagnotte fidélité") appliquait le signe négatif deux fois : le reste algébrique brut
+était écrit dans le champ saisi sans tenir compte de l'inversion de signe déjà automatique sur une
+ligne de remise (`LignePosteViewModel.MontantEffectif`), faisant diverger la somme affichée.
+
+**Correctif :** `PeutEnregistrer` accepte `MontantSaisi >= 0` ; `CompleterLeReste` réinverse le reste
+avant de l'écrire quand la ligne cible est une remise (`EstRemise`).
+
+**Corrigé le :** 2026-10-12.
+
+### BUG-002 — Achat entièrement couvert par une cagnotte impossible à enregistrer
+**Symptôme :** `AchatValidator` rejetait tout montant `<= 0`, alors qu'un achat réellement débité à
+0€ (totalement compensé par une cagnotte fidélité) est un cas valide.
+
+**Correctif :** seul un montant strictement négatif est désormais rejeté (`< 0`).
+
+**Corrigé le :** 2026-10-12.
+
+### BUG-001 — Pré-remplissage de date et flag "orpheline" obsolète dans le contrôle de rapprochement
+**Symptôme :** deux problèmes distincts remontés ensemble par le PO. (1) En cliquant sur une ligne
+"à saisir" du contrôle de rapprochement pour ouvrir la modale d'ajout, la date pré-remplie restait
+au 1er du mois au lieu de reprendre la date déjà connue de la ligne de relevé (`AchatPrefill`
+n'était jamais reporté sur `DateAchat`). (2) En contrôlant un même mois avec plusieurs relevés
+successifs, un achat marqué "orpheline" au premier passage gardait ce marqueur même une fois
+rapproché par un relevé suivant : le statut n'était jamais réévalué à `false`, seulement mis à `true`.
+
+**Correctif :** `AchatModalViewModel` reporte `prefill.DatePrelevement` sur `DateAchat` ; `MoisViewModel.AnalyserControle`
+recalcule `EstOrpheline` pour chaque achat à chaque passage, au lieu de ne jamais le réinitialiser.
+
+**Corrigé le :** 2026-10-12.
+
+---
+
 ## Terminé
+
+### US-015 — Inclure le prompt d'extraction de relevé dans l'aide elle-même
+**En tant qu'**utilisateur, **je veux** que le prompt standardisé d'extraction de relevé (PDF → xlsx) soit lisible directement depuis l'aide en ligne
+**afin de** pouvoir l'utiliser même en n'ayant que l'application installée, sans le dépôt de développement.
+
+**Décisions PO (livrées) :**
+- Nouveau thème d'aide "Extraire un relevé (prompt)" (`Aide/ExtraireUnReleve.md`), copie orientée utilisateur du prompt et de sa checklist de validation, sans les références de code.
+- `docs/prompt-extraction-releve-cic.md` reste la source de vérité technique côté dépôt (références aux classes C#, destiné aux sessions de dev) — un commentaire en tête renvoie désormais explicitement vers la copie utilisateur et rappelle de répercuter manuellement tout changement dans les deux.
+- Le thème "Contrôle bancaire" renvoie maintenant vers ce nouveau thème d'aide plutôt que vers le chemin dépôt, inaccessible une fois l'appli publiée.
+- Au passage : documentation de la subtilité "achat entièrement payé avec une cagnotte" (montant 0€ autorisé, signe automatiquement inversé sur un poste de remise) ajoutée au thème "Saisir une opération".
+
+**Conditions de réussite :**
+- [x] Le prompt est lisible intégralement depuis l'aide en ligne, sans dépendre du dépôt de développement.
+
+**Livré le :** 2026-10-12.
 
 ### US-007 — Aide utilisateur accessible depuis l'application
 **En tant qu'**utilisateur, **je veux** accéder à une aide directement depuis l'application (icône « ? » à droite de l'onglet Admin dans la barre d'onglets)

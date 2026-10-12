@@ -5,7 +5,7 @@ Le bouton **Contrôler avec un relevé** compare vos saisies à un relevé banca
 ## Formats acceptés
 
 - Un export CSV téléchargé depuis le site de votre banque.
-- Un fichier xlsx, par exemple si vous faites extraire un relevé PDF par un assistant IA (voir `docs/prompt-extraction-releve-cic.md` dans le dépôt pour un exemple de prompt reproductible).
+- Un fichier xlsx, par exemple si vous faites extraire un relevé PDF par un assistant IA (voir le thème **Extraire un relevé (prompt)** dans cette aide pour un prompt reproductible).
 
 ## Ce que montre le contrôle
 
